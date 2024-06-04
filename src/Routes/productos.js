@@ -1,14 +1,9 @@
 const express = require('express');
+const { getAllProducts } = require('../Controlers/productos');
 
 const router = express.Router();
 
 //trae prods
-router.get('/', async(req, res) => {
-    try {
-        res.send("hola pelotudo");
-    } catch (error) {
-        console.log(error);
-    }
-});
+router.get('/', getAllProducts);
 
 module.exports = router;

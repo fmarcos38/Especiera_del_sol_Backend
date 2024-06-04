@@ -4,6 +4,10 @@ const cors = require('cors'); //para solicitudes seguras
 const connectDB = require('./src/DataBase/db');
 //--importo de rutas--------------------
 const routerProductos = require('./src/Routes/productos');
+const routerClientes = require('./src/Routes/cliente');
+const routerRemitos = require('./src/Routes/remito');
+
+
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -18,6 +22,9 @@ connectDB();
 
 //--invoco rutas con app-------------------------------------------------
 app.use("/productos", routerProductos);
+app.use('/clientes', routerClientes);
+app.use('/remitos', routerRemitos);
+
 app.listen(port, () => {
     console.log(`servidor escuchando en puerto:, ${port}`);
 });
