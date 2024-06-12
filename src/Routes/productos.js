@@ -15,14 +15,13 @@ router.get('/', getAllProducts);
 router.post('/', upload.single("imagen"), async(req, res) => {
     
     try {
-        const { nombre, precioKg, precioUnidad, kgsUnidad, imagen } = req.body;
+        const { nombre, precioKg, kgsUnidad, imagen } = req.body;
         //Upload image to cloudinary
         const result = await cloudinary.uploader.upload(req.file.path);
 
         const nuevoProducto = new Productos({
             nombre,
             precioKg,
-            precioUnidad,
             kgsUnidad,
             imagen: result.secure_url,
             cloudinary_id: result.public_id
