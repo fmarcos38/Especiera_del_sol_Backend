@@ -7,7 +7,6 @@ const ProductoSchema = Schema({
     kgsUnidad: {type: Number, required: true },
     imagen: {type: String },
     cloudinary_id: { type: String },
-    enPromo: {type: Boolean, default: false}
 });
 
 module.exports = model("Producto", ProductoSchema);

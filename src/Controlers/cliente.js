@@ -10,6 +10,17 @@ const getAllClientes = async(req, res) => {
     }
 };
 
+//trae por ID
+const getByID = async(req, res) => {
+    try {
+        const {_id} = req.params; 
+        const cliente = await Cliente.findById({_id});
+        res.status(200).json(cliente);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 //trae cliente por nombre
 const buscaClientePorNombre = async (req, res) => {
     try {
@@ -35,11 +46,17 @@ const buscaClientePorNombre = async (req, res) => {
 const createCliente = async(req, res) => {
     try {
         const {nombre,apellido, razonSocial, telefono, email, ciudad, direccion, iva, cuit} = req.body;
-        const nuevoCliente = new Cliente({
-            nombre,apellido, razonSocial, telefono, email, ciudad, direccion, iva, cuit
-        });
-        await nuevoCliente.save();
-        res.status(200).send("Cliente creado con exito");
+
+        const existeCliente = await Cliente.findOne({ cuit });
+        if(existeCliente){
+            return res.send("Ese cliente ya existe");
+        }else{
+            const nuevoCliente = new Cliente({
+                nombre,apellido, razonSocial, telefono, email, ciudad, direccion, iva, cuit
+            });
+            await nuevoCliente.save();
+            return res.status(200).send("Cliente creado con exito");
+        }
     } catch (error) {
         console.log(error);
     }
@@ -83,6 +100,7 @@ const eliminaCliente = async (req, res) => {
 
 module.exports = {
     getAllClientes,
+    getByID,
     createCliente,
     modificaCliente,
     buscaClientePorNombre,

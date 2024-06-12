@@ -1,5 +1,8 @@
 const express = require('express');
-const { getAllClientes, createCliente, modificaCliente, buscaClientePorNombre, eliminaCliente } = require('../Controlers/cliente');
+const { 
+    getAllClientes, createCliente, modificaCliente, 
+    buscaClientePorNombre, eliminaCliente, getByID 
+} = require('../Controlers/cliente');
 
 const router = express.Router();
 
@@ -7,7 +10,10 @@ const router = express.Router();
 //trae clientes
 router.get('/', getAllClientes);
 
-//trae cliente por id
+//trae cliete por ID
+router.get('/:_id', getByID);
+
+//trae cliente por nombre
 router.get("/buscaPorNombre", buscaClientePorNombre);
 
 //crea cliente
