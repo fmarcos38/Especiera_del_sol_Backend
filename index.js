@@ -3,10 +3,10 @@ const dotenv = require('dotenv'); //esto es para que lea las variables de entorn
 const cors = require('cors'); //para solicitudes seguras
 const connectDB = require('./src/DataBase/db');
 //--importo de rutas--------------------
-const routerProductos = require('./src/Routes/productos');
-const routerClientes = require('./src/Routes/cliente');
-const routerRemitos = require('./src/Routes/remito');
-
+const routerProductos = require('./src/Routes/routesProducto');
+const routerClientes = require('./src/Routes/routesCliente');
+const routerRemitos = require('./src/Routes/routesRemito');
+const routerProveedores = require('./src/Routes/routesProveedor');
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -24,6 +24,7 @@ connectDB();
 app.use("/productos", routerProductos);
 app.use('/clientes', routerClientes);
 app.use('/remitos', routerRemitos);
+app.use('/proveedores', routerProveedores);
 
 app.listen(port, () => {
     console.log(`servidor escuchando en puerto:, ${port}`);

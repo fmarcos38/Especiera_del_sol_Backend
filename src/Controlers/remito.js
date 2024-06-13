@@ -1,4 +1,4 @@
-const Remito = require('../Models/remito');
+const Remito = require('../Models/modelRemito');
 
 const getAllRemitos = async(req, res) => {
     try {

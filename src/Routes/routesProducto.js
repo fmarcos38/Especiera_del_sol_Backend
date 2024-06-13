@@ -2,7 +2,7 @@ const express = require('express');
 const upload = require('../Helpers/multer');
 const cloudinary = require('../Helpers/cloudinary');
 const { getAllProducts, eliminaProd } = require('../Controlers/productos');
-const Producto = require('../Models/productos');
+const Producto = require('../Models/modelProductos');
 
 const router = express.Router();
 
