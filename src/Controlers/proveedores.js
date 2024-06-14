@@ -34,20 +34,23 @@ const createProveedor = async(req, res) => {
 //editar
 const editaProveedor = async(req, res) => {
     try {
-        const {_id} = req.params;
-        const {data} = req.body;
+        const { _id } = req.params;
+        const updateData = req.body;
 
-        const provMidif = await Cliente.findByIdAndUpdate(_id, updateData);
+        const updatedProv = await Proveedor.findByIdAndUpdate(_id, updateData);
 
-        if(!prov){
-            return res.send("Prov no encontrado");
+        if (!updatedProv) {
+            return res.status(404).json({ message: 'Prov no encontrado' });
         }
-
-        res.json(provMidif);
-    } catch (error) {
         
+        const provModificado = await Proveedor.findById({_id});
+        res.json(provModificado);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al actualizar el prov', error });
     }
 }
+
+
 module.exports = {
     getProveedores,
     createProveedor,

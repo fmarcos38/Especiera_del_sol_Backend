@@ -75,7 +75,8 @@ const modificaCliente = async (req, res) => {
             return res.status(404).json({ message: 'Cliente no encontrado' });
         }
 
-        res.json(updatedClient);
+        const clienteModificado = await Cliente.findById({_id});
+        res.json(clienteModificado);
     } catch (error) {
         res.status(500).json({ message: 'Error al actualizar el cliente', error });
     }
