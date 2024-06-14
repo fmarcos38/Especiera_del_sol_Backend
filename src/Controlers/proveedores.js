@@ -31,7 +31,25 @@ const createProveedor = async(req, res) => {
     }
 };
 
+//editar
+const editaProveedor = async(req, res) => {
+    try {
+        const {_id} = req.params;
+        const {data} = req.body;
+
+        const provMidif = await Cliente.findByIdAndUpdate(_id, updateData);
+
+        if(!prov){
+            return res.send("Prov no encontrado");
+        }
+
+        res.json(provMidif);
+    } catch (error) {
+        
+    }
+}
 module.exports = {
     getProveedores,
     createProveedor,
+    editaProveedor,
 }
