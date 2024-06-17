@@ -30,15 +30,14 @@ const buscaClientePorNombre = async (req, res) => {
             return res.status(400).json({ message: 'Nombre y apellido son requeridos' });
         }
 
-        const client = await Cliente.findOne({ nombre, apellido });
-
-        if (!client) {
-            return res.status(404).json({ message: 'Cliente no encontrado' });
+        const cliente = await Cliente.findOne({ nombre, apellido });
+        if (!cliente) {
+            return res.status(404).json({ message: 'Proveedor no encontrado' });
         }
 
-        res.json(client.toObject()); // Convertir a objeto plano
+        res.status(200).json(cliente);
     } catch (error) {
-        res.status(500).json({ message: 'Error al buscar el cliente', error });
+        console.log(error);
     }
 };
 
@@ -93,7 +92,7 @@ const eliminaCliente = async (req, res) => {
             return res.status(404).json({ message: 'Cliente no encontrado' });
         }
 
-        res.json({ message: 'Cliente eliminado correctamente' });
+        res.send({ message: 'Cliente eliminado correctamente' });
     } catch (error) {
         res.status(500).json({ message: 'Error al eliminar el cliente', error });
     }

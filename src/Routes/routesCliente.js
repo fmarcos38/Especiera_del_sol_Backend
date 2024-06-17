@@ -10,14 +10,14 @@ const router = express.Router();
 //trae clientes
 router.get('/', getAllClientes);
 
-//trae cliete por ID
-router.get('/:_id', getByID);
-
-//trae cliente por nombre
-router.get("/buscaPorNombre", buscaClientePorNombre);
-
 //crea cliente
 router.post('/', createCliente);
+
+//trae cliente por nombre
+router.get('/buscaPorNombre', buscaClientePorNombre);
+
+//trae cliete por ID
+router.get('/:_id', getByID);
 
 //modif cliente
 router.put("/modificaCliente/:_id", modificaCliente);

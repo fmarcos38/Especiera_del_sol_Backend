@@ -1,7 +1,7 @@
 const express = require('express');
 const upload = require('../Helpers/multer');
 const cloudinary = require('../Helpers/cloudinary');
-const { getAllProducts, eliminaProd } = require('../Controlers/productos');
+const { getAllProducts, eliminaProd, buscaPorNombre } = require('../Controlers/productos');
 const Producto = require('../Models/modelProductos');
 
 const router = express.Router();
@@ -9,7 +9,8 @@ const router = express.Router();
 //trae prods
 router.get('/', getAllProducts);
 
-//trar prod por ID
+//trar prod por nombre
+router.get('/buscaPorNombre', buscaPorNombre);
 
 //crea producto - manejo de imgs con Cloudinary
 router.post('/', upload.single("imagen"), async(req, res) => {
@@ -67,6 +68,7 @@ router.put('/:_id', upload.single("imagen"), async(req, res) => {
         console.log(error)
     }
 });
+
 //elimina prod
 router.delete('/:_id', eliminaProd);
 

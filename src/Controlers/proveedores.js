@@ -11,6 +11,25 @@ const getProveedores = async(req, res) => {
     }
 }
 
+//busca por ID
+const buscaProveedorPorNombre = async(req, res) => {
+    try {
+        const { nombre, apellido } = req.query;
+
+        if (!nombre || !apellido) {
+            return res.status(400).json({ message: 'Nombre y apellido son requeridos' });
+        }
+
+        const proveedor = await Proveedor.findOne({ nombre, apellido });
+        if (!proveedor) {
+            return res.status(404).json({ message: 'Proveedor no encontrado' });
+        }
+
+        res.status(200).json(proveedor);
+    } catch (error) {
+        console.log(error);
+    }
+};
 //crea proveed
 const createProveedor = async(req, res) => {
     try {
@@ -48,11 +67,29 @@ const editaProveedor = async(req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Error al actualizar el prov', error });
     }
-}
+};
 
+//elimina 
+const eliminaProv = async(req, res) => {
+    try {
+        const { _id } = req.params;
+        
+        const provEliminado = await Proveedor.findByIdAndDelete(_id).lean();
+
+        if (!provEliminado) {
+            return res.status(404).json({ message: 'Prov no encontrado' });
+        }
+
+        res.send({ message: 'Prov eliminado correctamente' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error al eliminar el prov', error });
+    }
+};
 
 module.exports = {
     getProveedores,
+    buscaProveedorPorNombre,
     createProveedor,
     editaProveedor,
+    eliminaProv
 }

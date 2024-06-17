@@ -11,6 +11,21 @@ const getAllProducts = async(req, res) => {
     }
 }
 
+//busca por nombre
+const buscaPorNombre = async(req, res) => {
+    try {
+        const {nombre} = req.query;
+        const prod = await Producto.findOne({nombre});
+
+        if(!prod){
+            return res.send("Prod no encontrado");
+        }
+
+        res.status(200).json(prod);
+    } catch (error) {
+        console.log(error);
+    }
+};
 //elimina producto
 const eliminaProd = async(req, res) => {
     try {
@@ -31,4 +46,5 @@ const eliminaProd = async(req, res) => {
 module.exports = {
     getAllProducts,
     eliminaProd,
+    buscaPorNombre
 }
