@@ -1,7 +1,8 @@
 const express = require('express');
 const { 
     getAllClientes, createCliente, modificaCliente, 
-    buscaClientePorNombre, eliminaCliente, getByID 
+    buscaClientePorNombre, eliminaCliente, getByID, 
+    buscaClientePorCuit
 } = require('../Controlers/cliente');
 
 const router = express.Router();
@@ -15,6 +16,9 @@ router.post('/', createCliente);
 
 //trae cliente por nombre
 router.get('/buscaPorNombre', buscaClientePorNombre);
+
+//trae cliente por cuit
+router.get('/cuit', buscaClientePorCuit);
 
 //trae cliete por ID
 router.get('/:_id', getByID);

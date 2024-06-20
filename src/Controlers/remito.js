@@ -9,7 +9,27 @@ const getAllRemitos = async(req, res) => {
     }
 };
 
+const creaRemito = async(req, res) => {
+    try {
+        const {num_remito, items, totPedido, cuit, fecha_compra, condicion_pago, estado} = req.body;
+        const newRemito = new Remito({
+            num_remito, 
+            items, 
+            totPedido, 
+            cuit, 
+            fecha_compra, 
+            condicion_pago, 
+            estado
+        });
+        await newRemito.save();
+        res.json(newRemito);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 
 module.exports = {
     getAllRemitos,
+    creaRemito,
 }

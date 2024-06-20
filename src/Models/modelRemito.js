@@ -1,10 +1,13 @@
 const { Schema, model } = require('mongoose');
 
 const RemitoSchema = Schema({
-    items: {type: Array, default:[]},
+    num_remito: {type: Number, required: true},
+    items: {type: Array, default:[], required: true},
     totPedido: {type: String, required: true},
-    id_cliente: {type: String, required: true},
-    fecha_compra: {type: Date}
+    cuit: {type: Number, required: true},
+    fecha_compra: {type: Date, required: true},
+    condicion_pago: {type: String},
+    estado: {type: String}
 });
 
 module.exports = model("Remitos", RemitoSchema);

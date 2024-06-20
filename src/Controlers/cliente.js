@@ -32,10 +32,26 @@ const buscaClientePorNombre = async (req, res) => {
 
         const cliente = await Cliente.findOne({ nombre, apellido });
         if (!cliente) {
-            return res.status(404).json({ message: 'Proveedor no encontrado' });
+            return res.status(404).json({ message: 'Cliente no encontrado' });
         }
 
         res.status(200).json(cliente);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+//trea cliente por cuit
+const buscaClientePorCuit = async(req, res) => {
+    try {
+        const {cuit} = req.query; 
+        const cliente = await Cliente.findOne({cuit}); 
+
+        if(!cliente){
+            return res.send("El cliente no existe");
+        }
+
+        res.json(cliente);
     } catch (error) {
         console.log(error);
     }
@@ -101,6 +117,7 @@ const eliminaCliente = async (req, res) => {
 module.exports = {
     getAllClientes,
     getByID,
+    buscaClientePorCuit,
     createCliente,
     modificaCliente,
     buscaClientePorNombre,

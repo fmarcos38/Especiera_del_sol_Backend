@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 //crea user
 const creaUser = async(req, res) => {
     try {
-        const { email, password } = req.body;
+        const { nombre, email, password, esAdmin } = req.body;
 
         const existeEmail = await User.findOne({email});
         if(existeEmail){ return RTCRtpSender("Ya existe usuario con ese Email")};
@@ -14,8 +14,10 @@ const creaUser = async(req, res) => {
         passwordEncript = CryptoJS.AES.encrypt( password, process.env.PASS_SEC ).toString();
         //creo user
         const newUser = new User({
+            nombre,
             email,
-            password: passwordEncript
+            password: passwordEncript,
+            esAdmin
         });
 
         await newUser.save();
