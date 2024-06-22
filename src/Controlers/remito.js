@@ -1,5 +1,6 @@
 const Remito = require('../Models/modelRemito');
 
+
 const getAllRemitos = async(req, res) => {
     try {
         const allR = await Remito.find();
@@ -9,15 +10,28 @@ const getAllRemitos = async(req, res) => {
     }
 };
 
-const creaRemito = async(req, res) => {
+//trae el último remito para obtnere el num 
+const ultimoRemito = async(req, res) => {
     try {
-        const {num_remito, items, totPedido, cuit, fecha_compra, condicion_pago, estado} = req.body;
+        const remito =  await Remito.find().sort({$natural:-1}).limit(1);
+        res.json({
+            ultimoRemito: remito[0].numRemito
+        });
+    } catch (error) {
+        console.log(error)
+    }
+};
+const creaRemito = async(req, res) => {
+
+    try {
+        const { numRemito, items, totPedido, cuit, condicion_pago, estado} = req.body; console.log("data:", req.body)
+
         const newRemito = new Remito({
-            num_remito, 
+            numRemito, 
             items, 
             totPedido, 
             cuit, 
-            fecha_compra, 
+            fecha_compra: new Date(), 
             condicion_pago, 
             estado
         });
@@ -28,8 +42,24 @@ const creaRemito = async(req, res) => {
     }
 };
 
+//elimna remito
+const elimninaRemito = async(req, res) => {
+    try {
+        const {_id} = req.params;
+        const remito = await Remito.findByIdAndDelete({_id});
+
+        if(!remito){ return res.send("Remito no encontrado")}
+
+        res.json(remito);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 
 module.exports = {
     getAllRemitos,
+    ultimoRemito,
     creaRemito,
+    elimninaRemito,
 }
