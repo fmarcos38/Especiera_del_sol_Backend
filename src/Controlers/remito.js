@@ -10,6 +10,17 @@ const getAllRemitos = async(req, res) => {
     }
 };
 
+//trae reitos de un cliente x cuit del cliente
+const getRemitosCliente = async (req, res) => {
+    try {
+        const { cuit } = req.params;
+        const remitos = await Remito.find({ cuit });
+        res.status(200).json(remitos);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 //trae el último remito para obtnere el num 
 const ultimoRemito = async(req, res) => {
     try {
@@ -21,17 +32,31 @@ const ultimoRemito = async(req, res) => {
         console.log(error)
     }
 };
+
+//trae remito por ID
+const getRemitoById = async(req,res) => {
+    try {
+        const {_id} = req.params;
+        const remito = await Remito.findById({_id});
+        if(!remito){ return res.send("No existe el remito")}
+
+        res.status(200).json(remito);
+    } catch (error) {
+        console.log(error);
+    }
+};
+//crea
 const creaRemito = async(req, res) => {
 
     try {
-        const { numRemito, items, totPedido, cuit, condicion_pago, estado} = req.body; console.log("data:", req.body)
+        const { numRemito, items, totPedido, cuit, condicion_pago, estado} = req.body; 
 
         const newRemito = new Remito({
             numRemito, 
             items, 
             totPedido, 
             cuit, 
-            fecha_compra: new Date(), 
+            fecha: new Date(), 
             condicion_pago, 
             estado
         });
@@ -59,6 +84,8 @@ const elimninaRemito = async(req, res) => {
 
 module.exports = {
     getAllRemitos,
+    getRemitosCliente,
+    getRemitoById,
     ultimoRemito,
     creaRemito,
     elimninaRemito,
