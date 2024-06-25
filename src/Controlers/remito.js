@@ -45,6 +45,7 @@ const getRemitoById = async(req,res) => {
         console.log(error);
     }
 };
+
 //crea
 const creaRemito = async(req, res) => {
 
@@ -64,6 +65,22 @@ const creaRemito = async(req, res) => {
         res.json(newRemito);
     } catch (error) {
         console.log(error);
+    }
+};
+
+//modif
+const modificaRemito = async(req, res) => {
+    try {
+        const {_id} = req.params;
+        const data = req.body;
+        const remito = await Remito.findByIdAndUpdate(_id, data);
+
+        if(!remito){ return res.send("No existe el remito")}
+
+        res.send("Se modif con exito");
+
+    } catch (error) {
+        
     }
 };
 
@@ -88,5 +105,6 @@ module.exports = {
     getRemitoById,
     ultimoRemito,
     creaRemito,
+    modificaRemito,
     elimninaRemito,
 }

@@ -1,5 +1,5 @@
 const express = require('express');
-const { getAllRemitos, creaRemito, elimninaRemito, ultimoRemito, getRemitosCliente, getRemitoById } = require('../Controlers/remito');
+const { getAllRemitos, creaRemito, elimninaRemito, ultimoRemito, getRemitosCliente, getRemitoById, modificaRemito } = require('../Controlers/remito');
 
 const router = express.Router();
 
@@ -12,13 +12,14 @@ router.post('/', creaRemito);
 //trae remito por id
 router.get('/:_id', getRemitoById);
 
-//tre reitos de un cliente
+//trae reitos de un cliente
 router.get('/remitosCliente/:cuit', getRemitosCliente);
 
 //trea último remito
 router.get('/ultimoRemito', ultimoRemito);
 
-//busca remito por CUIT
+//modif remito
+router.put('/modificaRemito/:_id', modificaRemito);
 
 //elimnia
 router.delete('/elimina/:_id', elimninaRemito);
