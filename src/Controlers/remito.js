@@ -3,8 +3,22 @@ const Remito = require('../Models/modelRemito');
 
 const getAllRemitos = async(req, res) => {
     try {
+        const { estado } = req.query; 
         const allR = await Remito.find();
-        res.json(allR);
+        let remitos;
+
+        if(estado){
+            if(estado === "Debe"){
+                remitos = allR.filter(r => r.estado !== "Pagado");
+                return res.json(remitos);
+            } 
+            if(estado === "Pagado"){
+                remitos = allR.filter(r => r.estado !== "Debe");
+                return res.json(remitos);
+            }
+        }else{
+            return res.json(allR);
+        }
     } catch (error) {
         console.log(error);
     }
@@ -13,9 +27,28 @@ const getAllRemitos = async(req, res) => {
 //trae reitos de un cliente x cuit del cliente
 const getRemitosCliente = async (req, res) => {
     try {
-        const { cuit } = req.params;
-        const remitos = await Remito.find({ cuit });
-        res.status(200).json(remitos);
+        const {estado, fechaDesde, fechaHasta} = req.query; console.log("fecha:", fechaDesde);
+        const { cuit } = req.params; 
+        const allR = await Remito.find({ cuit });
+        let remitos;
+        let fechaD = new Date(fechaDesde);
+        let fechaH = new Date(fechaHasta);
+
+        if(estado === "Debe"){
+            remitos = allR.filter(r => r.estado !== "Pagado");
+            return res.json(remitos);
+        } 
+        if(estado === "Pagado"){
+            remitos = allR.filter(r => r.estado !== "Debe");
+            return res.json(remitos);
+        }
+        if(estado === 'todos'){
+            return res.status(200).json(allR);
+        }
+        if(fechaDesde && fechaHasta){
+            remitos = remitos.filter(r => r.fecha >= fechaD && r.fecha <= fechaH);
+            return remitos;
+        }
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -37,7 +70,7 @@ const ultimoRemito = async(req, res) => {
 const getRemitoById = async(req,res) => {
     try {
         const {_id} = req.params;
-        const remito = await Remito.findById({_id});
+        const remito = await Remito.findById({_id}); 
         if(!remito){ return res.send("No existe el remito")}
 
         res.status(200).json(remito);
@@ -69,10 +102,11 @@ const creaRemito = async(req, res) => {
 };
 
 //modif
-const modificaRemito = async(req, res) => {
+const modificaRemito = async(req, res) => {    
     try {
         const {_id} = req.params;
         const data = req.body;
+
         const remito = await Remito.findByIdAndUpdate(_id, data);
 
         if(!remito){ return res.send("No existe el remito")}

@@ -10,7 +10,7 @@ router.get('/', getAllRemitos);
 router.post('/', creaRemito);
 
 //trae remito por id
-router.get('/:_id', getRemitoById);
+router.get('/remitoId/:_id', getRemitoById);
 
 //trae reitos de un cliente
 router.get('/remitosCliente/:cuit', getRemitosCliente);
