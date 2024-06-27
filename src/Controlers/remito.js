@@ -1,6 +1,5 @@
 const Remito = require('../Models/modelRemito');
 
-
 const getAllRemitos = async(req, res) => {
     try {
         const { estado } = req.query; 
@@ -27,12 +26,10 @@ const getAllRemitos = async(req, res) => {
 //trae reitos de un cliente x cuit del cliente
 const getRemitosCliente = async (req, res) => {
     try {
-        const {estado, fechaDesde, fechaHasta} = req.query; console.log("fecha:", fechaDesde);
+        const {estado} = req.query; 
         const { cuit } = req.params; 
         const allR = await Remito.find({ cuit });
         let remitos;
-        let fechaD = new Date(fechaDesde);
-        let fechaH = new Date(fechaHasta);
 
         if(estado === "Debe"){
             remitos = allR.filter(r => r.estado !== "Pagado");
@@ -44,11 +41,7 @@ const getRemitosCliente = async (req, res) => {
         }
         if(estado === 'todos'){
             return res.status(200).json(allR);
-        }
-        if(fechaDesde && fechaHasta){
-            remitos = remitos.filter(r => r.fecha >= fechaD && r.fecha <= fechaH);
-            return remitos;
-        }
+        }       
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -83,14 +76,15 @@ const getRemitoById = async(req,res) => {
 const creaRemito = async(req, res) => {
 
     try {
-        const { numRemito, items, totPedido, cuit, condicion_pago, estado} = req.body; 
+        const { numRemito, items, fecha, totPedido, cuit, condicion_pago, estado} = req.body; 
 
         const newRemito = new Remito({
             numRemito, 
-            items, 
+            items,
+            fecha, 
             totPedido, 
             cuit, 
-            fecha: new Date(), 
+            fecha: fecha, 
             condicion_pago, 
             estado
         });
