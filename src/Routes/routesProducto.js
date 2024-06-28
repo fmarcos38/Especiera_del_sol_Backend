@@ -37,10 +37,10 @@ router.post('/', upload.single("imagen"), async(req, res) => {
 //modifica prod
 router.put('/:_id', upload.single("imagen"), async(req, res) => {    
     try {
-        const { _id } = req.params;
-        const { nombre, precioKg, envase } = req.body;
+        const { _id } = req.params; 
+        const { nombre, precioKg, envase } = req.body;  
         //busco prod, para los datos q no vienen dejar los mismos
-        const prod = Producto.findById({_id});
+        const prod = await Producto.findById({_id}); console.log("prod:", prod)
 
         //manejo de la imagen SI es q viene
         let result;
