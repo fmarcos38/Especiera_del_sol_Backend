@@ -4,7 +4,23 @@ const Proveedor = require('../Models/modelProveedor');
 const getProveedores = async(req, res) => {
     try {
         const allProveedores = await Proveedor.find();
-        res.json(allProveedores);
+        const proveedores = allProveedores.map(p => {
+            const newP = {
+                nombre: p.nombre,
+                apellido: p.apellido,
+                nombreApe: p.nombre + " " + p.apellido,
+                razonSocial:p.razonSocial,
+                telefono:p.telefono,
+                email:p.email,
+                ciudad:p.ciudad,
+                direccion:p.direccion,
+                cuit:p.cuit,
+                iva:p.iva,
+                remitos:p.remitos,
+            }
+            return newP;
+        });
+        res.json(proveedores);
     } catch (error) {
         res.status(401).send("Algo salió mal");
         console.log(error);
