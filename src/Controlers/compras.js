@@ -29,6 +29,7 @@ const creaCompra = async(req, res) => {
         if(detalle === 'Anticipo'){
             const newCompra = new Compra({
                 fecha: Date.now(),
+                envio: "Pago",
                 detalle,
                 total,                
                 estado,
