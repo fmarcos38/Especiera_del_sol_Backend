@@ -9,6 +9,7 @@ const routerRemitos = require('./src/Routes/routesRemito');
 const routerProveedores = require('./src/Routes/routesProveedor');
 const routerAuth = require('./src/Routes/routesAuth');
 const routerUser = require('./src/Routes/routesUser');
+const routerCompras = require('./src/Routes/routesCompras');
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -29,6 +30,8 @@ app.use('/remitos', routerRemitos);
 app.use('/proveedores', routerProveedores);
 app.use('/auth', routerAuth);
 app.use('/usuarios', routerUser);
+app.use('/compras', routerCompras);
+
 
 app.listen(port, () => {
     console.log(`servidor escuchando en puerto:, ${port}`);

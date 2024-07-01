@@ -60,17 +60,27 @@ const buscaClientePorCuit = async(req, res) => {
 //crea cliente
 const createCliente = async(req, res) => {
     try {
-        const {nombre,apellido, razonSocial, telefono, email, ciudad, direccion, iva, cuit} = req.body;
+        const {nombre, apellido, razonSocial, telefono, email, ciudad, direccion, iva, cuit} = req.body;
 
         const existeCliente = await Cliente.findOne({ cuit });
         if(existeCliente){
             return res.send("Ese cliente ya existe");
         }else{
             const nuevoCliente = new Cliente({
-                nombre,apellido, razonSocial, telefono, email, ciudad, direccion, iva, cuit
+                nombre, 
+                apellido, 
+                nombreApellido: nombre +" "+ apellido,
+                razonSocial, 
+                telefono, 
+                email, 
+                ciudad, 
+                direccion, 
+                iva, 
+                cuit
             });
             await nuevoCliente.save();
-            return res.status(200).send("Cliente creado con exito");
+            console.log(nuevoCliente)
+            return res.status(200).json(nuevoCliente); 
         }
     } catch (error) {
         console.log(error);
