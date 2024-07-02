@@ -26,6 +26,7 @@ const buscaPorNombre = async(req, res) => {
         console.log(error);
     }
 };
+
 //elimina producto
 const eliminaProd = async(req, res) => {
     try {
