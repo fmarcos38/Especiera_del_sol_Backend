@@ -24,7 +24,7 @@ const ultimoRemito = async(req, res) => {
 //crea
 const creaCompra = async(req, res) => {
     try {
-        const {numRemito, proveedor, items, total, detalle, estado, observaciones, detallePago} = req.body;
+        const {numRemito, proveedor, items, total, detalle, producto, cantidad, unitario, estado, observaciones, detallePago} = req.body;
 
         if(detalle === 'Anticipo'){
             const newCompra = new Compra({
@@ -43,12 +43,15 @@ const creaCompra = async(req, res) => {
                 fecha: Date.now(),
                 numRemito,
                 proveedor,
-                items,
+                producto, 
+                cantidad, 
+                unitario,
                 detalle,
                 total,
                 estado,
                 observaciones,
-                detallePago
+                detallePago,
+                items,
             });
             await newCompra.save();
             return res.json(newCompra);
