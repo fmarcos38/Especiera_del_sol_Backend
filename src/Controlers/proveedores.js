@@ -6,9 +6,10 @@ const getProveedores = async(req, res) => {
         const allProveedores = await Proveedor.find();
         const proveedores = allProveedores.map(p => {
             const newP = {
+                _id: p._id,
                 nombre: p.nombre,
                 apellido: p.apellido,
-                nombreApe: p.nombre + " " + p.apellido,
+                nombreApe: p.nombre+" "+p.apellido,
                 razonSocial:p.razonSocial,
                 telefono:p.telefono,
                 email:p.email,
@@ -88,7 +89,7 @@ const editaProveedor = async(req, res) => {
 //elimina 
 const eliminaProv = async(req, res) => {
     try {
-        const { _id } = req.params;
+        const { _id } = req.params; console.log("id:", req.params)
         
         const provEliminado = await Proveedor.findByIdAndDelete(_id).lean();
 

@@ -9,15 +9,38 @@ const getCompras = async(req, res) => {
     }
 };
 
-//trae el último remito para obtnere el num 
-const ultimoRemito = async(req, res) => {
+//trae compras de un proveedor por el cuit del prov
+const getComprasProveedor = async(req, res) => {
     try {
-        const remito =  await Compra.find().sort({$natural:-1}).limit(1);
+        const { proveedor } = req.query; 
+        const compras = await Compra.find({proveedor});
+
+        if(!compras){ return res.send("No se encontraron compras para dicho Prov")}
+
+        //obtengo el el num del últimop remito
+        let ultimoRemito;
+        for(let i=0; i<compras.length; i++) {
+            if(compras[i].numRemito){
+                ultimoRemito = compras[i].numRemito;
+            }
+        };
         res.json({
-            ultimoRemito: remito[0].numRemito
+            compras,
+            ultimoRemito
         });
     } catch (error) {
-        console.log(error)
+        console.log(error);
+    }
+};
+
+//trae remito por id
+const getRemito = async(req, res) => {
+    try {
+        const {_id} = req.params; 
+        const compra = await Compra.findById({_id});
+        res.status(200).json(compra);
+    } catch (error) {
+        console.log(error);
     }
 };
 
@@ -64,7 +87,7 @@ const creaCompra = async(req, res) => {
 //modif
 const modificaCompra = async(req, res) => {    
     try {
-        const {_id} = req.params;
+        const {_id} = req.params; 
         const data = req.body;
 
         const compra = await Compra.findByIdAndUpdate(_id, data);
@@ -95,7 +118,8 @@ const eliminaCompra = async(req, res) => {
 
 module.exports = {
     getCompras,
-    ultimoRemito,
+    getComprasProveedor,
+    getRemito,
     creaCompra,
     modificaCompra,
     eliminaCompra,
