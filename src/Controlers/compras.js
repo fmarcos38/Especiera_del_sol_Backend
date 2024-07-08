@@ -33,7 +33,7 @@ const getUltimoRemito = async(req, res) => {
     }
 };
 
-//trae compras de un proveedor por el cuit del prov
+//trae compras de un proveedor por el cuit del prov y estado Debo O Pago
 const getComprasProveedor = async(req, res) => {
     try {
         const { proveedor, estado } = req.query; 
@@ -52,7 +52,7 @@ const getComprasProveedor = async(req, res) => {
                 return res.json(comprasEstado);
             }
         }
-        
+
         res.json(compras);
     } catch (error) {
         console.log(error);

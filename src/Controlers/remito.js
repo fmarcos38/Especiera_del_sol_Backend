@@ -76,10 +76,11 @@ const getRemitoById = async(req,res) => {
 const creaRemito = async(req, res) => {
 
     try {
-        const { numRemito, items, fecha, totPedido, cuit, condicion_pago, estado} = req.body; 
+        const { numRemito, cliente, items, fecha, totPedido, cuit, condicion_pago, estado} = req.body; 
 
         const newRemito = new Remito({
-            numRemito, 
+            numRemito,
+            cliente, 
             items,
             fecha, 
             totPedido, 
