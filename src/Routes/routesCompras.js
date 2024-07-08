@@ -1,10 +1,13 @@
 const express = require('express');
-const { getCompras, creaCompra, eliminaCompra, modificaCompra, getComprasProveedor, getRemito, getUltimoRemito } = require('../Controlers/compras');
+const { 
+    getAllCompras, creaCompra, eliminaCompra, modificaCompra, 
+    getComprasProveedor, getRemito, getUltimoRemito 
+} = require('../Controlers/compras');
 
 const router = express.Router();
 
 //trae todas las compras
-router.get('/', getCompras);
+router.get('/', getAllCompras);
 
 //trae ult num remito
 router.get('/ultimoRemito', getUltimoRemito);

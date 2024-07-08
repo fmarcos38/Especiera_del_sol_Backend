@@ -1,8 +1,10 @@
 const Compra = require('../Models/modelCompras');
 
-const getCompras = async(req, res) => {
+const getAllCompras = async(req, res) => {
     try {
+        const {estado} = req.query;
         const compras = await Compra.find();
+        
         res.json(compras);
     } catch (error) {
         console.log(error);
@@ -34,11 +36,23 @@ const getUltimoRemito = async(req, res) => {
 //trae compras de un proveedor por el cuit del prov
 const getComprasProveedor = async(req, res) => {
     try {
-        const { proveedor } = req.query; 
+        const { proveedor, estado } = req.query; 
         const compras = await Compra.find({proveedor});
+        let comprasEstado;
 
         if(!compras){ return res.send("No se encontraron compras para dicho Prov")}
 
+        if(estado){
+            if(estado === "Debo"){
+                comprasEstado = compras.filter(c => c.estado !== 'Pago');
+                return res.json(comprasEstado);
+            }
+            if(estado === 'Pago'){
+                comprasEstado = compras.filter(c => c.estado !== 'Debo');
+                return res.json(comprasEstado);
+            }
+        }
+        
         res.json(compras);
     } catch (error) {
         console.log(error);
@@ -129,7 +143,7 @@ const eliminaCompra = async(req, res) => {
 
 
 module.exports = {
-    getCompras,
+    getAllCompras,
     getUltimoRemito,
     getComprasProveedor,
     getRemito,
