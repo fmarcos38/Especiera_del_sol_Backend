@@ -16,7 +16,7 @@ router.get('/buscaPorNombre', buscaPorNombre);
 router.post('/', upload.single("imagen"), async(req, res) => {
     
     try {
-        const { nombre, precioKg, envase } = req.body;
+        const { nombre, precioKg, envase, costo } = req.body;
         //Upload image to cloudinary
         const result = await cloudinary.uploader.upload(req.file.path);
 
@@ -24,6 +24,7 @@ router.post('/', upload.single("imagen"), async(req, res) => {
             nombre,
             precioKg,
             envase,
+            costo,
             imagen: result.secure_url,
             cloudinary_id: result.public_id
         });
