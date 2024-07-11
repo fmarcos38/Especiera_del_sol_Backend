@@ -43,19 +43,19 @@ const getVentasMes = async(year, month) => {
 const createReporte = async(req, res) => {
     const {year, month} = req.body;
     try {
-        const comprasMes = await getComprasMes(year, month); console.log("compras:", comprasMes)
-        const ventasMes = await getVentasMes(year, month); console.log("ventas:", ventasMes)
+        const comprasMes = await getComprasMes(year, month);
+        const ventasMes = await getVentasMes(year, month); 
         let totCompras = 0;
         let totVentas = 0;
         let totalGastosMes = 0;
         let totalMes = 0;
         let mes;
-        let resultado;
 
         comprasMes.map(c => {
             if(c.detalle === "Compra"){
                 return totCompras += c.total;
             }
+            return totCompras;
         });
         ventasMes.map(c => {
             return totVentas += c.totPedido;
