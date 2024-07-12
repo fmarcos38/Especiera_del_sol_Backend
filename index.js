@@ -11,6 +11,8 @@ const routerAuth = require('./src/Routes/routesAuth');
 const routerUser = require('./src/Routes/routesUser');
 const routerCompras = require('./src/Routes/routesCompras');
 const routerReportes = require('./src/Routes/routesReporte');
+const routerGastos = require('./src/Routes/routesGastos');
+
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -33,6 +35,7 @@ app.use('/auth', routerAuth);
 app.use('/usuarios', routerUser);
 app.use('/compras', routerCompras);
 app.use('/reportes', routerReportes);
+app.use('/gastos', routerGastos);
 
 
 app.listen(port, () => {
