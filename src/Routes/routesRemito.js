@@ -1,5 +1,8 @@
 const express = require('express');
-const { getAllRemitos, creaRemito, elimninaRemito, ultimoRemito, getRemitosCliente, getRemitoById, modificaRemito } = require('../Controlers/remito');
+const { 
+    getAllRemitos, creaRemito, elimninaRemito, ultimoRemito, getRemitosCliente, 
+    getRemitoById, modificaRemito, agregaEntrega 
+} = require('../Controlers/remito');
 
 const router = express.Router();
 
@@ -23,5 +26,8 @@ router.put('/modificaRemito/:_id', modificaRemito);
 
 //elimnia
 router.delete('/elimina/:_id', elimninaRemito);
+
+//inserta una entrega de dinero de un cliente
+router.post('/entrega/:_id', agregaEntrega);
 
 module.exports = router;

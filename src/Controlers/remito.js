@@ -1,4 +1,6 @@
 const Remito = require('../Models/modelRemito');
+const Producto = require('../Models/modelProductos');
+
 
 const getAllRemitos = async(req, res) => {
     try {
@@ -127,6 +129,22 @@ const elimninaRemito = async(req, res) => {
     }
 };
 
+//inserta una entrega de dinero 
+const agregaEntrega = async(req, res) => {
+    const {_id} = req.params;
+    const {monto} = req.body; 
+    const fechaActual = new Date(); //console.log("fecha:", fechaActual)
+    try {
+        let remito = await Remito.findById(_id);
+        if(!remito){return res.send("No existe el remito")}
+
+        remito.entrego.push({entrega: Number(monto), fechaEntrega: fechaActual});
+        remito = await Remito.findByIdAndUpdate(_id, remito);
+        res.json(remito);
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 module.exports = {
     getAllRemitos,
@@ -136,4 +154,5 @@ module.exports = {
     creaRemito,
     modificaRemito,
     elimninaRemito,
+    agregaEntrega,
 }
