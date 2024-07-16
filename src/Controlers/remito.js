@@ -1,5 +1,4 @@
 const Remito = require('../Models/modelRemito');
-const Producto = require('../Models/modelProductos');
 
 
 const getAllRemitos = async(req, res) => {

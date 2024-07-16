@@ -7,8 +7,9 @@ const traeVentas = async(month, year) => {
     try {
         let ventas;
         let totVentas = 0;
+        let totGanancias = 0;
 
-        if (year && month) {
+        if (year && month !== 0) {
             const startDate = new Date(year, month - 1, 1); 
             const endDate = new Date(year, month, 1); 
 
@@ -23,16 +24,27 @@ const traeVentas = async(month, year) => {
             ventas.map(v => {
                 return totVentas += v.totPedido;
             });
-
-            return totVentas;
+            //caclulo ganancia
+            ventas.map(v => {
+                return totGanancias += calcGanancia(v.items);
+            });
+            return {
+                totVentas,
+                totGanancias
+            };
         }else{
-            ventas = await Ventas.find();
-            
+            ventas = await Ventas.find();            
             ventas.map(v => {
                 return totVentas += v.totPedido;
             });
-
-            return totVentas;
+            //caclulo ganancia
+            ventas.map(v => {
+                return totGanancias += calcGanancia(v.items);
+            });
+            return {
+                totVentas,
+                totGanancias
+            };
         }
     } catch (error) {
         
@@ -94,8 +106,9 @@ const traeGastos = async(month, year) => {
             });
             return totGastos;
         }else{
-            gastos.map(g => {
-                return totGastos += g.monto;
+            gastos = await Gastos.find();
+            gastos.map(c => {
+                return totGastos += c.monto;
             });
             return totGastos;
         }
@@ -103,29 +116,72 @@ const traeGastos = async(month, year) => {
         
     }
 };
+//funcion calc la ganancia de c/venta
+//recibe por parametro un  remitos
+const calcGanancia = (items) => {
+    let ganacia = 0;
+    items.map(item => {  
+        ganacia += ((item.unitario * item.cantidad) - (item.costo * item.cantidad));
+    });
+    return ganacia;
+};
 
-//crea reporte para un mes del año
+
+//crea reporte 
 const reporteMes = async(req, res) => {
-    const {month, year} = req.params; 
-    let ventas, compras, gastos, reporte;
+    const {month, year, meses} = req.query; 
+    let ventas = 0, compras = 0, gastos = 0, reporte;
+    const reporteMeses = [];
 
     try {
+        //por mes para un año x; retorna un obj
         if(month && year){
             ventas = await traeVentas(month, year);
             compras = await traeCompras(month, year);
             gastos = await traeGastos(month, year);
             reporte = {
-                ventas,
+                ventas: ventas.totVentas,
+                ganancias: ventas.totGanancias,
                 compras,
                 gastos,
                 month,
                 year
             }
             return res.json(reporte);
-        }else{
-            return res.send("No hay reportes para dicha fecha")
         }
-
+        //los meses de un año x; retorna un array de obj
+        if(!month && year && meses === "true"){ 
+            for (let index = 0; index < 12; index++) {
+                ventas = await traeVentas([index + 1], year);
+                compras = await traeCompras([index + 1], year);
+                gastos = await traeGastos([index + 1], year);                
+                reporteMeses.push({
+                    ventas: ventas.totVentas,
+                    ganancias: ventas.totGanancias,
+                    compras,
+                    gastos,
+                    month: index + 1,
+                    year
+                });                
+            }
+            return res.json(reporteMeses);
+        }
+        //solo un año; retorna un obj
+        if(!month && year){ 
+            ventas = await traeVentas(0, year);
+            compras = await traeCompras(0, year);
+            gastos = await traeGastos(0, year);
+            reporte = {
+                ventas: ventas.totVentas,
+                ganancias: ventas.totGanancias,
+                compras,
+                gastos,
+                year
+            }
+            return res.json(reporte);
+        }
+        
+        return res.send("No hay reportes para dicha fecha")
     } catch (error) {
         console.log(error);
     }

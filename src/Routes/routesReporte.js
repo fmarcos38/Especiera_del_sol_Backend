@@ -5,6 +5,8 @@ const router = express.Router();
 
 
 //trae un reporte para cierto mes del año
-router.get('/reporteMes/:month/:year', reporteMes);
+//router.get('/reporteMes/:month/:year', reporteMes);
+router.get('/reporteMes', reporteMes);
+
 
 module.exports = router;
