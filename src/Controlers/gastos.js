@@ -19,11 +19,10 @@ const getAllGastos = async(req, res) => {
             if(!gastos){ return res.send("No hay gastos")}
 
             return res.json(gastos);
-        }else{
+        }
             gastos = await Gasto.find();
 
-            return res.json(gastos);
-        }
+            res.json(gastos);
     } catch (error) {
         console.log(error);
     }

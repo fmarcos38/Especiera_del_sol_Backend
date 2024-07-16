@@ -5,7 +5,7 @@ const { getAllGastos, createGasto } = require('../Controlers/gastos');
 const router = express.Router();
 
 //trae gastos
-router.get('/:year/:month', getAllGastos);
+router.get('/', getAllGastos);
 
 //crea
 router.post('/', createGasto);

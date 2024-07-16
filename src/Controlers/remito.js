@@ -17,7 +17,8 @@ const getAllRemitos = async(req, res) => {
                 remitos = allR.filter(r => r.estado !== "Debe");
                 return res.json(remitos);
             }
-        }else{
+        }
+        if(estado === "todos"){
             return res.json(allR);
         }
     } catch (error) {

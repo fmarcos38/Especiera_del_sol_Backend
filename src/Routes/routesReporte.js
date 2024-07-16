@@ -1,11 +1,10 @@
 const express = require('express');
-const { createReporte } = require('../Controlers/reporte');
+const { createReporte, reporteMes } = require('../Controlers/reporte');
 
 const router = express.Router();
 
 
-//crea reporte de un mes
-router.post('/', createReporte);
-
+//trae un reporte para cierto mes del año
+router.get('/reporteMes/:month/:year', reporteMes);
 
 module.exports = router;

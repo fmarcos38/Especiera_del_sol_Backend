@@ -1,96 +1,137 @@
-const Reporte = require('../Models/modelReporte');
-const Compra = require('../Models/modelCompras');
-const Venta = require('../Models/modelRemito');
+const Ventas = require('../Models/modelRemito');
+const Compras = require('../Models/modelCompras');
+const Gastos = require('../Models/modelGastos');
 
-//trae compras de un mes
-const getComprasMes = async(year, month) => {
+//funcion trae ventas
+const traeVentas = async(month, year) => {
     try {
-        const startDate = new Date(year, month - 1, 1);
-        const endDate = new Date(year, month, 1);
-
-        const compras = await Compra.find({
-            fecha: {
-                $gte: startDate,
-                $lt: endDate,
-            },
-        });
-
-        return compras;
-    } catch (error) {
-        return({ error: 'Error al obtener las compras' });
-    }
-};
-//trae ventas de un mes
-const getVentasMes = async(year, month) => {
-    try {
-        const startDate = new Date(year, month - 1, 1);
-        const endDate = new Date(year, month, 1);
-
-        const ventas = await Venta.find({
-            fecha: {
-                $gte: startDate,
-                $lt: endDate,
-            },
-        });
-
-        return ventas;
-    } catch (error) {
-        return({ error: 'Error al obtener las ventas' });
-    }
-};
-
-//crea reporte
-const createReporte = async(req, res) => {
-    const {year, month} = req.body;
-    try {
-        const comprasMes = await getComprasMes(year, month);
-        const ventasMes = await getVentasMes(year, month); 
-        let totCompras = 0;
+        let ventas;
         let totVentas = 0;
-        let totalGastosMes = 0;
-        let totalMes = 0;
-        let mes;
 
-        comprasMes.map(c => {
-            if(c.detalle === "Compra"){
-                return totCompras += c.total;
-            }
-            return totCompras;
-        });
-        ventasMes.map(c => {
-            return totVentas += c.totPedido;
-        });
-        //calc tot mes
-        totalMes = totVentas - totCompras - totalGastosMes;
+        if (year && month) {
+            const startDate = new Date(year, month - 1, 1); 
+            const endDate = new Date(year, month, 1); 
 
-        if(month === "01") {mes = "Enero"}
-        if(month === "02") {mes = "Febrero"}
-        if(month === "03") {mes = "Mayo"}
-        if(month === "04") {mes = "Abril"}
-        if(month === "05") {mes = "Mayo"}
-        if(month === "06") {mes = "Junio"}
-        if(month === "07") {mes = "Julio"}
-        if(month === "08") {mes = "Agosto"}
-        if(month === "09") {mes = "Septiembre"}
-        if(month === "10") {mes = "Octubre"}
-        if(month === "11") {mes = "Noviembre"}
-        if(month === "12") {mes = "Diciembre"}
+            ventas = await Ventas.find({
+                fecha: {
+                    $gte: startDate,
+                    $lt: endDate,
+                },
+            });
+            if(!ventas){ return "No hay ventas"}
+            
+            ventas.map(v => {
+                return totVentas += v.totPedido;
+            });
+
+            return totVentas;
+        }else{
+            ventas = await Ventas.find();
+            
+            ventas.map(v => {
+                return totVentas += v.totPedido;
+            });
+
+            return totVentas;
+        }
+    } catch (error) {
         
-        const newMonth = new Reporte({
-            mes,
-            compras: totCompras,
-            ventas: totVentas,
-            gastos: totalGastosMes,
-            resultado: totalMes
-        });
-        await newMonth.save();
+    }
+};
+//funcion trae Compras
+const traeCompras = async(month, year) => {
+    let compras;
+    let totCompras = 0;
 
-        res.json(newMonth);
+    try {
+        if (year && month) {
+            const startDate = new Date(year, month - 1, 1);
+            const endDate = new Date(year, month, 1);
+
+            compras = await Compras.find({
+                fecha: {
+                    $gte: startDate,
+                    $lt: endDate,
+                },
+            });
+            if(!compras){ return res.send("No hay ventas")}
+
+            compras.map(c => {
+                return totCompras += c.total;
+            });
+            return totCompras;
+        }else{
+            compras = await Compras.find();
+            compras.map(c => {
+                return totCompras += c.total;
+            });
+            return totCompras;
+        }
+    } catch (error) {
+        
+    }
+};
+//funcion trae Compras
+const traeGastos = async(month, year) => {
+    let gastos;
+    let totGastos = 0;
+    
+    try {        
+        if (year && month) {
+            const startDate = new Date(year, month - 1, 1);
+            const endDate = new Date(year, month, 1);
+
+            gastos = await Gastos.find({
+                fecha: {
+                    $gte: startDate,
+                    $lt: endDate,
+                },
+            });
+            if(!gastos){ return res.send("No hay ventas")}
+
+            gastos.map(g => {
+                return totGastos += g.monto;
+            });
+            return totGastos;
+        }else{
+            gastos.map(g => {
+                return totGastos += g.monto;
+            });
+            return totGastos;
+        }
+    } catch (error) {
+        
+    }
+};
+
+//crea reporte para un mes del año
+const reporteMes = async(req, res) => {
+    const {month, year} = req.params; 
+    let ventas, compras, gastos, reporte;
+
+    try {
+        if(month && year){
+            ventas = await traeVentas(month, year);
+            compras = await traeCompras(month, year);
+            gastos = await traeGastos(month, year);
+            reporte = {
+                ventas,
+                compras,
+                gastos,
+                month,
+                year
+            }
+            return res.json(reporte);
+        }else{
+            return res.send("No hay reportes para dicha fecha")
+        }
+
     } catch (error) {
         console.log(error);
     }
 };
 
+
 module.exports = {
-    createReporte,
+    reporteMes,
 }
