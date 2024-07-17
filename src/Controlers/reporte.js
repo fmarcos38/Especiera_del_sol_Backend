@@ -125,7 +125,22 @@ const calcGanancia = (items) => {
     });
     return ganacia;
 };
-
+//funcion asigna nombre del mes
+const nombreMes = (num) => {
+    if(num === 1) {return "Enero"}
+    if(num === 2) {return "Febrero"}
+    if(num === 3) {return "Marzo"}
+    if(num === 4) {return "Abril"}
+    if(num === 5) {return "Mayo"}
+    if(num === 6) {return "Junio"}
+    if(num === 7) {return "Julio"}
+    if(num === 8) {return "Agosto"}
+    if(num === 9) {return "Septiembre"}
+    if(num === 10) {return "Octubre"}
+    if(num === 11) {return "Noviembre"}
+    if(num === 12) {return "Diciembre"}
+};
+//----------------------------------------------------------------------
 
 //crea reporte 
 const reporteMes = async(req, res) => {
@@ -160,7 +175,7 @@ const reporteMes = async(req, res) => {
                     ganancias: ventas.totGanancias,
                     compras,
                     gastos,
-                    month: index + 1,
+                    month: nombreMes(index + 1),
                     year
                 });                
             }
