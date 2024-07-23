@@ -8,7 +8,8 @@ const traeVentas = async(month, year) => {
         let ventas;
         let totVentas = 0;
         let totGanancias = 0;
-
+        let totKgs = 0;
+        //si viene año y mes
         if (year && month !== 0) {
             const startDate = new Date(year, month - 1, 1); 
             const endDate = new Date(year, month, 1); 
@@ -28,9 +29,13 @@ const traeVentas = async(month, year) => {
             ventas.map(v => {
                 return totGanancias += calcGanancia(v.items);
             });
+            //calc tot Kgs Vendidos
+            totKgs = totKgsVendidos(ventas);
+
             return {
                 totVentas,
-                totGanancias
+                totGanancias,
+                totKgs
             };
         }else{
             ventas = await Ventas.find();            
@@ -41,9 +46,12 @@ const traeVentas = async(month, year) => {
             ventas.map(v => {
                 return totGanancias += calcGanancia(v.items);
             });
+            //calc tot Kgs Vendidos
+            const totKgs = totKgsVendidos(ventas);
             return {
                 totVentas,
-                totGanancias
+                totGanancias,
+                totKgs
             };
         }
     } catch (error) {
@@ -83,7 +91,7 @@ const traeCompras = async(month, year) => {
         
     }
 };
-//funcion trae Compras
+//funcion trae gastos
 const traeGastos = async(month, year) => {
     let gastos;
     let totGastos = 0;
@@ -116,8 +124,7 @@ const traeGastos = async(month, year) => {
         
     }
 };
-//funcion calc la ganancia de c/venta
-//recibe por parametro un  remitos
+//funcion calc la ganancia de c/venta, recibe por parametro un  remitos
 const calcGanancia = (items) => {
     let ganacia = 0;
     items.map(item => {  
@@ -140,9 +147,20 @@ const nombreMes = (num) => {
     if(num === 11) {return "Noviembre"}
     if(num === 12) {return "Diciembre"}
 };
+//funcion calc kgs vendidos
+const totKgsVendidos = (ventas) => {
+    let tot = 0;
+    ventas.map(remito => {
+        remito.items.map(item => {
+            return tot += item.cantidad;
+        });
+        return tot;
+    });
+    return tot;
+}
 //----------------------------------------------------------------------
 
-//crea reporte 
+//trae reportes
 const reporteMes = async(req, res) => {
     const {month, year, meses} = req.query; 
     let ventas = 0, compras = 0, gastos = 0, reporte;
@@ -157,6 +175,7 @@ const reporteMes = async(req, res) => {
             reporte = {
                 ventas: ventas.totVentas,
                 ganancias: ventas.totGanancias,
+                totKgs: ventas.totKgs,
                 compras,
                 gastos,
                 month,
@@ -172,6 +191,7 @@ const reporteMes = async(req, res) => {
                 gastos = await traeGastos([index + 1], year);                
                 reporteMeses.push({
                     ventas: ventas.totVentas,
+                    totKgs: ventas.totKgs,
                     ganancias: ventas.totGanancias,
                     compras,
                     gastos,
@@ -183,11 +203,12 @@ const reporteMes = async(req, res) => {
         }
         //solo un año; retorna un obj
         if(!month && year){ 
-            ventas = await traeVentas(0, year);
+            ventas = await traeVentas(0, year); console.log("ventas:", ventas)           
             compras = await traeCompras(0, year);
             gastos = await traeGastos(0, year);
             reporte = {
                 ventas: ventas.totVentas,
+                totKgs: ventas.totKgs,
                 ganancias: ventas.totGanancias,
                 compras,
                 gastos,

@@ -8,16 +8,16 @@ const getAllRemitos = async(req, res) => {
         let remitos;
 
         if(estado){
-            if(estado === "Debe"){
+            if(estado == "Debe"){
                 remitos = allR.filter(r => r.estado !== "Pagado");
                 return res.json(remitos);
             } 
-            if(estado === "Pagado"){
+            if(estado == "Pagado"){
                 remitos = allR.filter(r => r.estado !== "Debe");
                 return res.json(remitos);
             }
         }
-        if(estado === "todos"){
+        if(estado == "todos"){
             return res.json(allR);
         }
     } catch (error) {
@@ -78,7 +78,7 @@ const getRemitoById = async(req,res) => {
 const creaRemito = async(req, res) => {
 
     try {
-        const { numRemito, cliente, items, fecha, totPedido, cuit, condicion_pago, estado} = req.body; 
+        const { numRemito, cliente, items, fecha, totPedido, cuit, condicion_pago, estado, bultos, transporte} = req.body; 
 
         const newRemito = new Remito({
             numRemito,
@@ -89,7 +89,9 @@ const creaRemito = async(req, res) => {
             cuit, 
             fecha: fecha, 
             condicion_pago, 
-            estado
+            estado,
+            bultos,
+            transporte,
         });
         await newRemito.save();
         res.json(newRemito);
@@ -102,7 +104,7 @@ const creaRemito = async(req, res) => {
 const modificaRemito = async(req, res) => {    
     try {
         const {_id} = req.params;
-        const data = req.body;
+        const data = req.body; console.log("data:", req.body)
 
         const remito = await Remito.findByIdAndUpdate(_id, data);
 
@@ -132,13 +134,13 @@ const elimninaRemito = async(req, res) => {
 //inserta una entrega de dinero 
 const agregaEntrega = async(req, res) => {
     const {_id} = req.params;
-    const {monto} = req.body; 
+    const {monto, metodoPago} = req.body; 
     const fechaActual = new Date(); //console.log("fecha:", fechaActual)
     try {
         let remito = await Remito.findById(_id);
         if(!remito){return res.send("No existe el remito")}
 
-        remito.entrego.push({entrega: Number(monto), fechaEntrega: fechaActual});
+        remito.entrego.push({entrega: Number(monto), fechaEntrega: fechaActual, metodoPago: metodoPago});
         remito = await Remito.findByIdAndUpdate(_id, remito);
         res.json(remito);
     } catch (error) {

@@ -22,8 +22,8 @@ const getUltimoRemito = async(req, res) => {
         //obtengo el el num del últimop remito
         let ultimoRemito = null;
         for(let i=0; i<compras.length; i++) {
-            if(compras[i].numRemito){
-                ultimoRemito = compras[i].numRemito;
+            if(compras[i].numCompra){
+                ultimoRemito = compras[i].numCompra;
             }
         };
         
@@ -73,7 +73,21 @@ const getRemito = async(req, res) => {
 //crea
 const creaCompra = async(req, res) => {
     try {
-        const {numRemito, proveedor, items, total, detalle, producto, cantidad, unitario, estado, observaciones, detallePago} = req.body;
+        const {
+            numCompra, 
+            numRemitoProveedor, 
+            transporte,
+            proveedor, 
+            items, 
+            total, 
+            detalle, 
+            producto, 
+            cantidad, 
+            unitario, 
+            estado, 
+            observaciones, 
+            detallePago
+        } = req.body;
 
         if(detalle === 'Anticipo'){
             const newCompra = new Compra({
@@ -90,7 +104,9 @@ const creaCompra = async(req, res) => {
         }else{
             const newCompra = new Compra({
                 fecha: Date.now(),
-                numRemito,
+                numCompra,
+                numRemitoProveedor,
+                transporte,
                 proveedor,
                 producto, 
                 cantidad, 

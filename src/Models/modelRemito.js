@@ -9,7 +9,9 @@ const RemitoSchema = Schema({
     cuit: {type: Number, required: true},
     fecha: {type: Date, required: true},
     condicion_pago: {type: String},
-    estado: {type: String}
+    estado: {type: String},
+    bultos: {type: Number},
+    transporte: {type: String},
 });
 
 module.exports = model("Remitos", RemitoSchema);

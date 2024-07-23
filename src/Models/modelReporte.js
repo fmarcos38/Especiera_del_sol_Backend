@@ -5,7 +5,8 @@ const ReporteSchema = new Schema({
     compras: {type: Number},
     ventas: {type: Number},
     gastos: {type: Array}, //trae los gastos como Lus, Alq, etc
-    resultado: {type: Number},
+    ganancia: {type: Number},
+    totKgs: {type: Number},
 });
 
 module.exports = model("Reporte", ReporteSchema);

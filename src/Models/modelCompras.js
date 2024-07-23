@@ -4,7 +4,9 @@ const CompraSchema = Schema({
     fecha: {type:Date},
     proveedor: {type: String},
     envio: {type: String}, //toma valor "Pago"
-    numRemito: {type: Number},
+    numCompra: {type: Number}, //num de compra a ese proveedor
+    numRemitoProveedor: {type: Number},
+    trasporte: {type: String}, 
     producto: {type: String},
     cantidad: {type: String}, 
     unitario: {type: Number}, 
