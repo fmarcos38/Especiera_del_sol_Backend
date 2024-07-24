@@ -8,13 +8,14 @@ const CompraSchema = Schema({
     numRemitoProveedor: {type: Number},
     trasporte: {type: String}, 
     producto: {type: String},
-    cantidad: {type: String}, 
+    cantidad: {type: Number}, 
     unitario: {type: Number}, 
     total: {type: Number},
     detalle: {type: String}, //toma el valo "Anticipo" o "Compra"
     estado: {type: String},    
     detallePago: {type: String},
     items: {type: Array, default:[]},
+    cuit: {type: Number},
 });
 
 module.exports = model("Compras", CompraSchema);

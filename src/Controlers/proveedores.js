@@ -47,6 +47,19 @@ const buscaProveedorPorNombre = async(req, res) => {
         console.log(error);
     }
 };
+//busca prov por CUIT
+const buscaProCuit = async(req, res) => {
+    try {
+        const {cuit} = req.params; 
+        const proveedor = await Proveedor.findOne({cuit});
+
+        if(!proveedor){ return res.send("No existe dicho prov")}
+        
+        res.json(proveedor);
+    } catch (error) {
+        console.log(error);
+    }
+};
 //crea proveed
 const createProveedor = async(req, res) => {
     try {
@@ -106,6 +119,7 @@ const eliminaProv = async(req, res) => {
 module.exports = {
     getProveedores,
     buscaProveedorPorNombre,
+    buscaProCuit,
     createProveedor,
     editaProveedor,
     eliminaProv

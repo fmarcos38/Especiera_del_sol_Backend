@@ -1,5 +1,5 @@
 const express = require('express');
-const { getProveedores, createProveedor, editaProveedor, eliminaProv, buscaProveedorPorNombre } = require('../Controlers/proveedores');
+const { getProveedores, createProveedor, editaProveedor, eliminaProv, buscaProveedorPorNombre, buscaProCuit } = require('../Controlers/proveedores');
 
 const router = express.Router();
 
@@ -8,6 +8,9 @@ router.get('/', getProveedores);
 
 //busca prov por buscaPorNombre
 router.get('/buscaPorNombre', buscaProveedorPorNombre);
+
+//busca por CUIT
+router.get('/porCuit/:cuit', buscaProCuit);
 
 //crea proveed
 router.post('/', createProveedor);

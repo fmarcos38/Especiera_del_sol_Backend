@@ -62,7 +62,7 @@ const getComprasProveedor = async(req, res) => {
 //trae remito por id
 const getRemito = async(req, res) => {
     try {
-        const {_id} = req.params; 
+        const {_id} = req.params;
         const compra = await Compra.findById({_id});
         res.status(200).json(compra);
     } catch (error) {
@@ -130,7 +130,7 @@ const creaCompra = async(req, res) => {
 const modificaCompra = async(req, res) => {    
     try {
         const {_id} = req.params; 
-        const data = req.body;
+        const data = req.body; 
 
         const compra = await Compra.findByIdAndUpdate(_id, data);
 
