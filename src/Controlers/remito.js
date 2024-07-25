@@ -3,23 +3,35 @@ const Remito = require('../Models/modelRemito');
 
 const getAllRemitos = async(req, res) => {
     try {
-        const { estado } = req.query; 
-        const allR = await Remito.find();
-        let remitos;
+        //así llega fecha: 2024-07-01
+        const {estado, fechaDesde, fechaHasta} = req.query;
+        let filtro = {};
 
-        if(estado){
-            if(estado == "Debe"){
-                remitos = allR.filter(r => r.estado !== "Pagado");
-                return res.json(remitos);
-            } 
-            if(estado == "Pagado"){
-                remitos = allR.filter(r => r.estado !== "Debe");
-                return res.json(remitos);
-            }
+        //filtro por Debe o Pagado
+        if(estado && estado !== "todas"){
+            filtro.estado = estado;
         }
-        if(estado == "todos"){
-            return res.json(allR);
+        //si vienen fechas
+        if(fechaDesde && fechaHasta){
+            filtro.fecha = {
+                $gte: new Date(fechaDesde),
+                $lte: new Date(fechaHasta),
+            };
+        } else if (!fechaDesde && !fechaHasta) {
+            //si no se proporcionan fechas MUESTRA la del mes ACTUAL
+            const fechaActual = new Date();
+            const mesInicio = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), 1);
+            const mesFin = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 0);
+
+            filtro.fecha = {
+                $gte: mesInicio,
+                $lte: mesFin,
+            };
         }
+        
+        const remitos = await Remito.find(filtro); //aplico filtro
+        res.json(remitos);
+
     } catch (error) {
         console.log(error);
     }

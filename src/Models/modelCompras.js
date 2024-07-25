@@ -12,7 +12,7 @@ const CompraSchema = Schema({
     unitario: {type: Number}, 
     total: {type: Number},
     detalle: {type: String}, //toma el valo "Anticipo" o "Compra"
-    estado: {type: String},    
+    /* estado: {type: String}, */    
     detallePago: {type: String},
     items: {type: Array, default:[]},
     cuit: {type: Number},

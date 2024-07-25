@@ -1,10 +1,34 @@
 const Compra = require('../Models/modelCompras');
 
 const getAllCompras = async(req, res) => {
-    try {
-        const {estado} = req.query;
-        const compras = await Compra.find();
+    try { 
+        //así llega fecha: 2024-07-01
+        const {detalle, fechaDesde, fechaHasta} = req.query;
+        let filtro = {};
+
+        //filtro por Debe o Pagado
+        if(detalle && detalle !== "todas"){
+            filtro.detalle = detalle;
+        }
+        //si vienen fechas
+        if(fechaDesde && fechaHasta){
+            filtro.fecha = {
+                $gte: new Date(fechaDesde),
+                $lte: new Date(fechaHasta),
+            };
+        } else if (!fechaDesde && !fechaHasta) {
+            //si no se proporcionan fechas MUESTRA la del mes ACTUAL
+            const fechaActual = new Date();
+            const mesInicio = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), 1);
+            const mesFin = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 0);
+
+            filtro.fecha = {
+                $gte: mesInicio,
+                $lte: mesFin,
+            };
+        }
         
+        const compras = await Compra.find(filtro); //aplico filtro
         res.json(compras);
     } catch (error) {
         console.log(error);
@@ -96,7 +120,7 @@ const creaCompra = async(req, res) => {
                 envio: "Pago",
                 detalle,
                 total,                
-                estado,
+                /* estado, */
                 detallePago,
             });
             await newCompra.save();
@@ -113,7 +137,7 @@ const creaCompra = async(req, res) => {
                 unitario,
                 detalle,
                 total,
-                estado,
+                /* estado, */
                 observaciones,
                 detallePago,
                 items,
