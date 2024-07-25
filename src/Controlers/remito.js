@@ -39,9 +39,9 @@ const getAllRemitos = async(req, res) => {
 
 //trae reitos de un cliente x cuit del cliente
 const getRemitosCliente = async (req, res) => {
-    try {
-        const {estado} = req.query; 
-        const { cuit } = req.params; 
+    const {estado} = req.query; 
+    const { cuit } = req.params;
+    try {         
         const allR = await Remito.find({ cuit });
         let remitos;
 

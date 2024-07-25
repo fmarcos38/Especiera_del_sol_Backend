@@ -31,7 +31,7 @@ const getAllGastos = async(req, res) => {
 const createGasto = async(req, res) => {
     const {descripcion, monto} = req.body;
     try {
-        const newGasto = new Gasto({
+        const newGasto = new Gastos({
             fecha: new Date(),
             descripcion,
             monto
@@ -43,10 +43,58 @@ const createGasto = async(req, res) => {
     }
 };
 
+//trae por ID
+const getByID = async(req, res) => {
+    try {
+        const {_id} = req.params; 
+        const gasto = await Gastos.findById({_id});
+        res.status(200).json(gasto);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 //modif
-//elimn
+const modificaGasto = async (req, res) => {
+    try {
+        const { _id } = req.params;
+        const updateData = req.body;
+
+
+        const updatedGoasto = await Gastos.findByIdAndUpdate(_id, updateData);
+
+        if (!updatedGoasto) {
+            return res.status(404).json({ message: 'Gasto no encontrado' });
+        }
+
+        //const gastoModificado = await Gastos.findById({_id});
+        res.send("Modif con exito");
+    } catch (error) {
+        res.status(500).json({ message: 'Error al actualizar el cliente', error });
+    }
+};
+
+//elimina
+const eliminaGasto = async (req, res) => {
+    try {
+        const { _id } = req.params;
+
+        const gasto = await Gastos.findByIdAndDelete(_id).lean();
+
+        if (!gasto) {
+            return res.status(404).json({ message: 'gasto no encontrado' });
+        }
+
+        res.send({ message: 'Gasto eliminado correctamente' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error al eliminar el gasto', error });
+    }
+};
 
 module.exports = {
     getAllGastos,
     createGasto,
+    getByID,
+    modificaGasto,
+    eliminaGasto,
 }
