@@ -2,7 +2,74 @@ const Ventas = require('../Models/modelRemito');
 const Compras = require('../Models/modelCompras');
 const Gastos = require('../Models/modelGastos');
 
-//funcion trae ventas
+//retorna un array con todas las ventas del Mes --> para mostrar por día
+const traeVentasMes = async(month, year) => {
+    try {
+        let ventas;
+        //si viene año y mes
+
+        const startDate = new Date(year, month - 1, 1);
+        const endDate = new Date(year, month, 1);
+
+        ventas = await Ventas.find({
+            fecha: {
+                $gte: startDate,
+                $lt: endDate,
+            },
+        });
+        if (!ventas) { return "No hay ventas" }
+
+        return ventas;
+
+    } catch (error) {
+        
+    }
+};
+//funcion trae Compras PARA un MES
+const traeComprasMes = async(month, year) => {
+    let compras;
+    try {
+        
+            const startDate = new Date(year, month - 1, 1);
+            const endDate = new Date(year, month, 1);
+
+            compras = await Compras.find({
+                fecha: {
+                    $gte: startDate,
+                    $lt: endDate,
+                },
+            });
+            if(!compras){ return res.send("No hay ventas")}
+            
+            return compras;
+        
+    } catch (error) {
+        
+    }
+};
+//funcion trae gastos PARa un MES
+const traeGastosMes = async(month, year) => {
+    let gastos;    
+    try {        
+        const startDate = new Date(year, month - 1, 1);
+            const endDate = new Date(year, month, 1);
+
+            gastos = await Gastos.find({
+                fecha: {
+                    $gte: startDate,
+                    $lt: endDate,
+                },
+            });
+            if(!gastos){ return res.send("No hay ventas")}
+
+            return gastos;
+        
+    } catch (error) {
+        
+    }
+};
+
+//funcion trae ventas Calc todo el mes Retorna el tot del mes
 const traeVentas = async(month, year) => {
     try {
         let ventas;
@@ -159,7 +226,6 @@ const totKgsVendidos = (ventas) => {
     return tot;
 }
 //----------------------------------------------------------------------
-
 //trae reportes
 const reporteMes = async(req, res) => {
     const {month, year, meses} = req.query; 
@@ -168,14 +234,12 @@ const reporteMes = async(req, res) => {
 
     try {
         //por mes para un año x; retorna un obj
-        if(month && year){
-            ventas = await traeVentas(month, year);
-            compras = await traeCompras(month, year);
-            gastos = await traeGastos(month, year);
+        if(month && year){ 
+            ventas = await traeVentasMes(month, year);
+            compras = await traeComprasMes(month, year);
+            gastos = await traeGastosMes(month, year);
             reporte = {
-                ventas: ventas.totVentas,
-                ganancias: ventas.totGanancias,
-                totKgs: ventas.totKgs,
+                ventas,
                 compras,
                 gastos,
                 month,
