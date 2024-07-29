@@ -27,6 +27,21 @@ const buscaPorNombre = async(req, res) => {
     }
 };
 
+//get by id
+const getById = async(req, res) => {
+    try {
+        const {_id} = req.params;
+        const prod = await Producto.findById({_id});
+
+        if(!prod){
+            return res.send("No existe el prod");
+        }
+
+        res.json(prod);
+    } catch (error) {
+        
+    }
+};
 //elimina producto
 const eliminaProd = async(req, res) => {
     try {
@@ -47,5 +62,6 @@ const eliminaProd = async(req, res) => {
 module.exports = {
     getAllProducts,
     eliminaProd,
-    buscaPorNombre
+    buscaPorNombre,
+    getById
 }

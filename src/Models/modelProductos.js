@@ -5,6 +5,7 @@ const ProductoSchema = Schema({
     precioKg: {type: Number, required: true},
     envase: {type: Number, required: true },
     costo: {type: Number, required: true },
+    posicionLista: {type: Number, required: true },
     imagen: {type: String },
     cloudinary_id: { type: String },
 });
