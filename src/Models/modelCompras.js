@@ -6,7 +6,7 @@ const CompraSchema = Schema({
     envio: {type: String}, //toma valor "Pago"
     numCompra: {type: Number}, //num de compra a ese proveedor
     numRemitoProveedor: {type: Number},
-    trasporte: {type: String}, 
+    transporte: {type: String}, 
     producto: {type: String},
     cantidad: {type: Number}, 
     unitario: {type: Number}, 
