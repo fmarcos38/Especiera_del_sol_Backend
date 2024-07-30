@@ -3,7 +3,6 @@ const upload = require('../Helpers/multer');
 const cloudinary = require('../Helpers/cloudinary');
 const { getAllProducts, eliminaProd, buscaPorNombre, getById } = require('../Controlers/productos');
 const Producto = require('../Models/modelProductos');
-const { actualizaPosiciones } = require('../Helpers/actualizaPisicion');
 
 const router = express.Router();
 
@@ -61,7 +60,7 @@ router.get('/:_id', getById);
 router.put('/:_id', upload.single("imagen"), async(req, res) => {    
     try {
         const { _id } = req.params; 
-        const { nombre, precioKg, envase, posicionLista } = req.body; 
+        //const { nombre, precioKg, envase, posicionLista } = req.body; 
         //busco prod, para los datos q no vienen dejar los mismos
         const prod = await Producto.findById({_id});
 
@@ -74,20 +73,21 @@ router.put('/:_id', upload.single("imagen"), async(req, res) => {
             result = await cloudinary.uploader.upload(req.file.path); //almaceno la nueva img
         }
 
-        // Llama a la función que actualiza la posición de los productos que le siguen al creado
-        //await actualizaPosiciones(posicionLista);
-
+        // Actualizar el producto con los nuevos datos y la nueva imagen si existe
         const modifProd = {
-            nombre: nombre || prod.nombre,
-            precioKg: precioKg || prod.precioKg,
-            envase: envase || prod.envase,
-            imagen: result?.secure_url || prod.imagen,
-            /* posicionLista: posicionLista || prod.posicionLista, */
-            cloudinary_id: result?.public_id || prod.cloudinary_id,
-        }
+            ...req.body,
+            imagen: result?.secure_url || prod.imagen, // Mantener la imagen anterior si no hay nueva
+            cloudinary_id: result?.public_id || prod.cloudinary_id // Mantener el ID de Cloudinary anterior si no hay nueva imagen
+        };
+        //actualizo
+        await Producto.findByIdAndUpdate(_id, modifProd);
 
-        //realizo la modif
-        await Producto.findByIdAndUpdate({_id:_id}, modifProd);
+        //Reenumerar todas las posiciones de los productos en la colección
+        const productos = await Producto.find().sort({ posicionLista: 1 });
+        for (let i = 0; i < productos.length; i++) {
+            productos[i].posicionLista = i + 1;
+            await productos[i].save();
+        }
         
         res.status(200).json(modifProd);
 
