@@ -52,6 +52,15 @@ const eliminaProd = async(req, res) => {
         if(!prod){
             return res.send("Prod no encontrado");
         }
+
+        //Reenumerar todas las posiciones de los productos en la colección
+        const productos = await Producto.find().sort({ posicionLista: 1 });
+
+        for (let i = 0; i < productos.length; i++) {
+            productos[i].posicionLista = i + 1;
+            await productos[i].save();
+        }
+        
         res.status(200).json(prod);
     } catch (error) {
         console.log(error);
