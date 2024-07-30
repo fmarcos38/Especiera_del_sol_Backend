@@ -21,8 +21,11 @@ router.post('/', upload.single("imagen"), async(req, res) => {
         //Upload image to cloudinary
         const result = await cloudinary.uploader.upload(req.file.path);
 
-        //Obtener todos los productos ordenados por _id
-        const productos = await Producto.find().sort({ posicionLista: 1 });
+        // Paso 1: Desplazar las posiciones de los productos existentes
+        await Producto.updateMany(
+            { posicionLista: { $gte: posicionLista } },
+            { $inc: { posicionLista: 1 } }
+        );
 
         //creo nuevo prod
         const nuevoProducto = new Producto({
@@ -34,16 +37,9 @@ router.post('/', upload.single("imagen"), async(req, res) => {
             imagen: result.secure_url,
             cloudinary_id: result.public_id
         });
-
-        // Insertar el nuevo producto en la posición especificada
-        productos.splice(posicionLista, -1, nuevoProducto);
-
-        // Paso 3: Guardar el nuevo producto y actualizar las posiciones de los productos existentes, arranco la iterasión desde la pos q viene del front
+        // Guardar el nuevo producto
         await nuevoProducto.save();
-        for (let i = posicionLista +1; i < productos.length; i++) {
-            await Producto.findByIdAndUpdate(productos[i]._id, { $set: { posicionLista: i } });
-        }
-
+        
         res.status(200).send("Creado con Exito!!");
     } catch (error) {
         console.log(error);
