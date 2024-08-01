@@ -4,7 +4,7 @@ const Remito = require('../Models/modelRemito');
 const getAllRemitos = async(req, res) => {
     try {
         //así llega fecha: 2024-07-01
-        const {estado, fechaDesde, fechaHasta} = req.query;
+        const {estado, fechaDesde, fechaHasta} = req.query; 
         let filtro = {};
 
         //filtro por Debe o Pagado
@@ -12,10 +12,20 @@ const getAllRemitos = async(req, res) => {
             filtro.estado = estado;
         }
         //si vienen fechas
-        if(fechaDesde && fechaHasta){
+        if (fechaDesde && fechaHasta) {
+            // Convertir fechaDesde al inicio del día
+            const startDate = new Date(fechaDesde);
+            startDate.setHours(0, 0, 0, 0);
+
+            // Añadir un día a fechaHasta y establecerla al inicio de ese día
+            const endDate = new Date(fechaHasta);
+            endDate.setDate(endDate.getDate() + 1);
+            endDate.setHours(23, 59, 59, 999);
+
+            // Configurar el filtro con las fechas ajustadas
             filtro.fecha = {
-                $gte: new Date(fechaDesde),
-                $lte: new Date(fechaHasta),
+                $gte: startDate,
+                $lt: endDate, // Usar $lt para excluir la medianoche del siguiente día
             };
         } else if (!fechaDesde && !fechaHasta) {
             //si no se proporcionan fechas MUESTRA la del mes ACTUAL
