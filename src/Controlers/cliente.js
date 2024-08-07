@@ -3,7 +3,7 @@ const Cliente = require('../Models/modelCliente');
 //trae clientes
 const getAllClientes = async(req, res) => {
     try {
-        const allClientes = await Cliente.find();
+        const allClientes = await Cliente.find().sort({ apellido: 1 }); // Ordena alfabéticamente por el campo 'apellido'
         res.json(allClientes);
     } catch (error) {
         console.log(error)
@@ -92,7 +92,6 @@ const modificaCliente = async (req, res) => {
     try {
         const { _id } = req.params;
         const updateData = req.body;
-
 
         const updatedClient = await Cliente.findByIdAndUpdate(_id, updateData);
 

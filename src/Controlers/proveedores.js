@@ -3,7 +3,7 @@ const Proveedor = require('../Models/modelProveedor');
 //trae proveedores
 const getProveedores = async(req, res) => {
     try {
-        const allProveedores = await Proveedor.find();
+        const allProveedores = await Proveedor.find().sort({ apellido: 1 });
         const proveedores = allProveedores.map(p => {
             const newP = {
                 _id: p._id,
