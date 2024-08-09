@@ -31,10 +31,10 @@ router.delete('/elimina/:_id', elimninaRemito);
 router.post('/entrega/:_id', agregaEntrega);
 
 //manejo de entregas
-router.put('/remito/:idRemito/entrega/:idEntrega', editaEntrega);
+router.put('/editaEntrega/:idRemito/entrega/:idEntrega', editaEntrega);
 
 // Ruta para eliminar una entrega
-router.delete('/remito/:idRemito/entrega/:idEntrega', eliminarEntrega);
+router.delete('/eliminaEntrega/:idRemito/entrega/:idEntrega', eliminarEntrega);
 
 
 module.exports = router;

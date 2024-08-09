@@ -163,7 +163,8 @@ const agregaEntrega = async(req, res) => {
         let remito = await Remito.findById(_id);
         if(!remito){return res.send("No existe el remito")}
 
-        remito.entrego.push({entrega: Number(monto), fechaEntrega: fechaActual, metodoPago: metodoPago});
+        const newID = remito.entrego.length + 1;
+        remito.entrego.push({id: newID, entrega: Number(monto), fechaEntrega: fechaActual, metodoPago: metodoPago});
         remito = await Remito.findByIdAndUpdate(_id, remito);
         res.json(remito);
     } catch (error) {
@@ -171,40 +172,33 @@ const agregaEntrega = async(req, res) => {
     }
 }
 //edita entrega
-const editaEntrega = async(req, res) => {
-    const { idRemito, idEntrega } = req.params;
-    const { entrega, metodoPago } = req.body;
+const editaEntrega = async (req, res) => {
+    const { idRemito, idEntrega } = req.params; console.log("ids:", req.params)
+    const { monto, metodoPago } = req.body; console.log("body:", req.body)
 
     try {
-        // Convertimos idEntrega a número si no lo está
-        const entregaId = parseInt(idEntrega);
-
-        // Buscamos el remito por ID y el elemento específico en el arreglo "entrego"
-        const remito = await Remito.findOne({ _id: idRemito });
+        const remito = await Remito.findOneAndUpdate(
+            { _id: idRemito, "entrego.id": parseInt(idEntrega) },
+            {
+                $set: {
+                    "entrego.$.entrega": parseInt(monto),
+                    "entrego.$.metodoPago": metodoPago
+                }
+            },
+            { new: true }
+        );
 
         if (!remito) {
-            return res.status(404).json({ message: 'Remito no encontrado' });
+            return res.status(404).json({ message: 'Remito o entrega no encontrada' });
         }
-
-        // Buscamos el subdocumento en el arreglo entrego
-        const entregaObj = remito.entrego.find(ent => ent.id === entregaId);
-
-        if (!entregaObj) {
-            return res.status(404).json({ message: 'Entrega no encontrada' });
-        }
-
-        // Actualizamos los campos si existen en la solicitud
-        if (entrega !== undefined) entregaObj.entrega = entrega;
-        if (metodoPago !== undefined) entregaObj.metodoPago = metodoPago;
-
-        // Guardamos los cambios en la base de datos
-        await remito.save();
 
         res.json(remito);
     } catch (error) {
-        
+        console.error("Error al editar la entrega:", error);
+        res.status(500).json({ message: 'Error al editar la entrega' });
     }
 };
+
 // Eliminar un elemento del arreglo "entrego"
 const eliminarEntrega = async (req, res) => {
     const { idRemito, idEntrega } = req.params;
