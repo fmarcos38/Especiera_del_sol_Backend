@@ -126,7 +126,7 @@ const creaRemito = async(req, res) => {
 const modificaRemito = async(req, res) => {    
     try {
         const {_id} = req.params;
-        const data = req.body; console.log("data:", req.body)
+        const data = req.body;
 
         const remito = await Remito.findByIdAndUpdate(_id, data);
 
@@ -153,6 +153,7 @@ const elimninaRemito = async(req, res) => {
     }
 };
 
+//Manejo de entregas HACER un Modelo con su CRUD 
 //inserta una entrega de dinero 
 const agregaEntrega = async(req, res) => {
     const {_id} = req.params;
@@ -169,6 +170,63 @@ const agregaEntrega = async(req, res) => {
         console.log(error);
     }
 }
+//edita entrega
+const editaEntrega = async(req, res) => {
+    const { idRemito, idEntrega } = req.params;
+    const { entrega, metodoPago } = req.body;
+
+    try {
+        // Convertimos idEntrega a número si no lo está
+        const entregaId = parseInt(idEntrega);
+
+        // Buscamos el remito por ID y el elemento específico en el arreglo "entrego"
+        const remito = await Remito.findOne({ _id: idRemito });
+
+        if (!remito) {
+            return res.status(404).json({ message: 'Remito no encontrado' });
+        }
+
+        // Buscamos el subdocumento en el arreglo entrego
+        const entregaObj = remito.entrego.find(ent => ent.id === entregaId);
+
+        if (!entregaObj) {
+            return res.status(404).json({ message: 'Entrega no encontrada' });
+        }
+
+        // Actualizamos los campos si existen en la solicitud
+        if (entrega !== undefined) entregaObj.entrega = entrega;
+        if (metodoPago !== undefined) entregaObj.metodoPago = metodoPago;
+
+        // Guardamos los cambios en la base de datos
+        await remito.save();
+
+        res.json(remito);
+    } catch (error) {
+        
+    }
+};
+// Eliminar un elemento del arreglo "entrego"
+const eliminarEntrega = async (req, res) => {
+    const { idRemito, idEntrega } = req.params;
+
+    try {
+        const remito = await Remito.findByIdAndUpdate(
+            idRemito,
+            {
+                $pull: { entrego: { id: parseInt(idEntrega) } }
+            },
+            { new: true }
+        );
+
+        if (!remito) {
+            return res.status(404).json({ message: 'Remito o entrega no encontrada' });
+        }
+
+        res.json(remito);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al eliminar la entrega', error });
+    }
+};
 
 module.exports = {
     getAllRemitos,
@@ -179,4 +237,6 @@ module.exports = {
     modificaRemito,
     elimninaRemito,
     agregaEntrega,
+    editaEntrega,
+    eliminarEntrega,
 }
