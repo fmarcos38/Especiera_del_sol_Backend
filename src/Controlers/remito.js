@@ -153,7 +153,7 @@ const elimninaRemito = async(req, res) => {
     }
 };
 
-//Manejo de entregas HACER un Modelo con su CRUD 
+//-----Manejo de entregas HACER un Modelo con su CRUD 
 //inserta una entrega de dinero 
 const agregaEntrega = async(req, res) => {
     const {_id} = req.params;
@@ -204,23 +204,28 @@ const eliminarEntrega = async (req, res) => {
     const { idRemito, idEntrega } = req.params;
 
     try {
-        const remito = await Remito.findByIdAndUpdate(
-            idRemito,
-            {
-                $pull: { entrego: { id: parseInt(idEntrega) } }
-            },
-            { new: true }
-        );
-
+        // Buscar el remito por ID
+        let remito = await Remito.findById(idRemito);
         if (!remito) {
-            return res.status(404).json({ message: 'Remito o entrega no encontrada' });
+            return res.status(404).json({ message: "Remito no encontrado" });
         }
+
+        // Filtrar el array 'entrego' para eliminar el elemento con el ID proporcionado
+        const newEntrego = remito.entrego.filter(e => e.id !== Number(idEntrega));
+
+        // Actualizar el remito con el nuevo array 'entrego'
+        remito.entrego = newEntrego;
+
+        // Guardar los cambios en la base de datos
+        await remito.save();
 
         res.json(remito);
     } catch (error) {
+        console.error('Error al eliminar la entrega:', error);
         res.status(500).json({ message: 'Error al eliminar la entrega', error });
     }
 };
+
 
 module.exports = {
     getAllRemitos,
