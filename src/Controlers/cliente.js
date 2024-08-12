@@ -58,34 +58,45 @@ const buscaClientePorCuit = async(req, res) => {
 };
 
 //crea cliente
-const createCliente = async(req, res) => {
+const createCliente = async (req, res) => {
     try {
-        const {nombre, apellido, razonSocial, telefono, email, ciudad, direccion, iva, cuit} = req.body;
+        const { nombre, apellido, razonSocial, telefono, email, ciudad, direccion, iva, cuit } = req.body;
 
-        const existeCliente = await Cliente.findOne({ cuit });
-        if(existeCliente){
-            return res.send("Ese cliente ya existe");
-        }else{
-            const nuevoCliente = new Cliente({
-                nombre, 
-                apellido, 
-                nombreApellido: nombre +" "+ apellido,
-                razonSocial, 
-                telefono, 
-                email, 
-                ciudad, 
-                direccion, 
-                iva, 
-                cuit
-            });
-            await nuevoCliente.save();
-            console.log(nuevoCliente)
-            return res.status(200).json(nuevoCliente); 
+        const existeClienteNombreApellido = await Cliente.findOne({ nombre, apellido });
+        const existeClienteEmail = await Cliente.findOne({ email });
+        const existeClienteCuit = await Cliente.findOne({ cuit });
+
+        if (existeClienteNombreApellido) {
+            return res.status(400).json({ message: `Ya existe un cliente ${nombre} ${apellido}` });
         }
+        if (existeClienteEmail) {
+            return res.status(400).json({ message: `Ya existe un cliente con email: ${email}` });
+        }
+        if (existeClienteCuit) {
+            return res.status(400).json({ message: `Ya existe un cliente con cuit: ${cuit}` });
+        }
+
+        const nuevoCliente = new Cliente({
+            nombre,
+            apellido,
+            nombreApellido: `${nombre} ${apellido}`,
+            razonSocial,
+            telefono,
+            email,
+            ciudad,
+            direccion,
+            iva,
+            cuit
+        });
+
+        await nuevoCliente.save();
+        return res.status(201).json({ message: 'Cliente creado con éxito' });
     } catch (error) {
         console.log(error);
+        return res.status(500).json({ message: 'Error al crear el cliente' });
     }
 };
+
 
 //modifica un cliente
 const modificaCliente = async (req, res) => {

@@ -49,27 +49,49 @@ const getAllRemitos = async(req, res) => {
 
 //trae reitos de un cliente x cuit del cliente
 const getRemitosCliente = async (req, res) => {
-    const {estado} = req.query; 
-    const { cuit } = req.params;
-    try {         
-        const allR = await Remito.find({ cuit });
-        let remitos;
+    //así llega fecha: 2024-07-01
+    try {
+        const { estado, fechaDesde, fechaHasta } = req.query;
+        const { cuit } = req.params;
+        let filtro = { cuit }; // Inicializamos el filtro con el CUIT del cliente
 
-        if(estado === "Debe"){
-            remitos = allR.filter(r => r.estado !== "Pagado");
-            return res.json(remitos);
-        } 
-        if(estado === "Pagado"){
-            remitos = allR.filter(r => r.estado !== "Debe");
-            return res.json(remitos);
+        // Filtro por estado (Debe o Pagado) si se proporciona
+        if (estado && estado !== "todos") {
+            filtro.estado = estado;
         }
-        if(estado === 'todos'){
-            return res.status(200).json(allR);
-        }       
+
+        // Filtro por fechas si se proporcionan
+        if (fechaDesde && fechaHasta) {
+            const startDate = new Date(fechaDesde);
+            startDate.setHours(0, 0, 0, 0); // Establece la hora al inicio del día
+
+            const endDate = new Date(fechaHasta);
+            endDate.setHours(23, 59, 59, 999); // Establece la hora al final del día
+
+            filtro.fecha = {
+                $gte: startDate,
+                $lte: endDate,
+            };
+        } else if (!fechaDesde && !fechaHasta) {
+            // Si no se proporcionan fechas, filtra por el mes actual
+            const fechaActual = new Date();
+            const mesInicio = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), 1);
+            const mesFin = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 0);
+
+            filtro.fecha = {
+                $gte: mesInicio,
+                $lte: mesFin,
+            };
+        }
+
+        // Buscar los remitos que coincidan con el CUIT y el filtro aplicado
+        const remitos = await Remito.find(filtro);
+        res.json(remitos);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
+
 
 //trae el último remito para obtnere el num 
 const ultimoRemito = async(req, res) => {

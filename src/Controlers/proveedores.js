@@ -65,18 +65,29 @@ const createProveedor = async(req, res) => {
     try {
         const {nombre,apellido, razonSocial, telefono, email, ciudad, direccion, iva, cuit} = req.body;
 
-        const existeCliente = await Proveedor.findOne({ cuit });
-        if(existeCliente){
-            return res.send("Ese proveedor ya existe");
-        }else{
-            const nuevoProveedor = new Proveedor({
-                nombre,apellido, razonSocial, telefono, email, ciudad, direccion, iva, cuit
-            });
-            await nuevoProveedor.save();
-            return res.status(200).send("Proveed creado con exito");
+        const existeProveedorNombreApellido = await Proveedor.findOne({ nombre, apellido });
+        const existeProveedorEmail = await Proveedor.findOne({ email });
+        const existeProveedorCuit = await Proveedor.findOne({ cuit });
+
+        if (existeProveedorNombreApellido) {
+            return res.status(400).json({ message: `Ya existe un Proveedor ${nombre} ${apellido}` });
         }
+        if (existeProveedorEmail) {
+            return res.status(400).json({ message: `Ya existe un Proveedor con email: ${email}` });
+        }
+        if (existeProveedorCuit) {
+            return res.status(400).json({ message: `Ya existe un Proveedor con cuit: ${cuit}` });
+        }
+            
+        const nuevoProveedor = new Proveedor({
+            nombre,apellido, razonSocial, telefono, email, ciudad, direccion, iva, cuit
+        });
+        await nuevoProveedor.save();
+        return res.status(201).json({ message: 'Proveedor creado con éxito' });
+        
     } catch (error) {
         console.log(error);
+        return res.status(500).json({ message: 'Error al crear el cliente' });
     }
 };
 
