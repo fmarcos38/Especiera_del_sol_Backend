@@ -8,7 +8,7 @@ const getAllRemitos = async(req, res) => {
         let filtro = {};
 
         //filtro por Debe o Pagado
-        if(estado && estado !== "todas"){
+        if(estado && estado !== "todos"){
             filtro.estado = estado;
         }
         //si vienen fechas
@@ -91,7 +91,6 @@ const getRemitosCliente = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
 
 //trae el último remito para obtnere el num 
 const ultimoRemito = async(req, res) => {

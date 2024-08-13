@@ -3,7 +3,7 @@ const { Schema, model } = require('mongoose');
 const CompraSchema = Schema({
     fecha: {type:Date},
     proveedor: {type: String},
-    envio: {type: String}, //toma valor "Pago"
+    estado: {type: String}, //toma valor "Debo" o "Pago"
     numCompra: {type: Number}, //num de compra a ese proveedor
     numRemitoProveedor: {type: Number},
     transporte: {type: String}, 

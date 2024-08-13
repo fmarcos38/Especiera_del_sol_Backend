@@ -1,23 +1,34 @@
 const Compra = require('../Models/modelCompras');
 
 const getAllCompras = async(req, res) => {
-    try { 
-        //así llega fecha: 2024-07-01
-        const {detalle, fechaDesde, fechaHasta} = req.query;
-        let filtro = {};
+    //así llega fecha: 2024-07-01
+    try {
+        const { detalle, estado, fechaDesde, fechaHasta } = req.query; console.log("data:", req.query)
+        let filtro = {}; 
 
-        //filtro por Debe o Pagado
-        if(detalle && detalle !== "todas"){
+        //filtro por detalle (Compra o Anticipo)
+        if(detalle && detalle !== "todos"){
             filtro.detalle = detalle;
         }
-        //si vienen fechas
-        if(fechaDesde && fechaHasta){
+        // Filtro por estado (Debe o Pagado) si se proporciona
+        if (estado && estado !== "todos") {
+            filtro.estado = estado;
+        }
+
+        // Filtro por fechas si se proporcionan
+        if (fechaDesde && fechaHasta) {
+            const startDate = new Date(fechaDesde);
+            startDate.setHours(0, 0, 0, 0); // Establece la hora al inicio del día
+
+            const endDate = new Date(fechaHasta);
+            endDate.setHours(23, 59, 59, 999); // Establece la hora al final del día
+
             filtro.fecha = {
-                $gte: new Date(fechaDesde),
-                $lte: new Date(fechaHasta),
+                $gte: startDate,
+                $lte: endDate,
             };
         } else if (!fechaDesde && !fechaHasta) {
-            //si no se proporcionan fechas MUESTRA la del mes ACTUAL
+            // Si no se proporcionan fechas, filtra por el mes actual
             const fechaActual = new Date();
             const mesInicio = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), 1);
             const mesFin = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 0);
@@ -27,11 +38,12 @@ const getAllCompras = async(req, res) => {
                 $lte: mesFin,
             };
         }
-        
-        const compras = await Compra.find(filtro); //aplico filtro
+
+        // Buscar los remitos que coincidan con el CUIT y el filtro aplicado
+        const compras = await Compra.find(filtro);
         res.json(compras);
     } catch (error) {
-        console.log(error);
+        res.status(500).json({ message: error.message });
     }
 };
 
@@ -59,27 +71,50 @@ const getUltimoRemito = async(req, res) => {
 
 //trae compras de un proveedor por el cuit del prov y estado Debo O Pago
 const getComprasProveedor = async(req, res) => {
+    //así llega fecha: 2024-07-01
     try {
-        const { proveedor, estado } = req.query; 
-        const compras = await Compra.find({proveedor});
-        let comprasEstado;
+        const { detalle, estado, fechaDesde, fechaHasta } = req.query; 
+        const { cuit } = req.params; 
+        let filtro = { cuit}; // Inicializamos el filtro con el CUIT del cliente
 
-        if(!compras){ return res.send("No se encontraron compras para dicho Prov")}
-
-        if(estado){
-            if(estado === "Debo"){
-                comprasEstado = compras.filter(c => c.estado !== 'Pago');
-                return res.json(comprasEstado);
-            }
-            if(estado === 'Pago'){
-                comprasEstado = compras.filter(c => c.estado !== 'Debo');
-                return res.json(comprasEstado);
-            }
+        //filtro por detalle (Compra o Anticipo)
+        if(detalle && detalle !== "todos"){
+            filtro.detalle = detalle;
+        }
+        // Filtro por estado (Debe o Pagado) si se proporciona
+        if (estado && estado !== "todos") {
+            filtro.estado = estado;
         }
 
+        // Filtro por fechas si se proporcionan
+        if (fechaDesde && fechaHasta) {
+            const startDate = new Date(fechaDesde);
+            startDate.setHours(0, 0, 0, 0); // Establece la hora al inicio del día
+
+            const endDate = new Date(fechaHasta);
+            endDate.setHours(23, 59, 59, 999); // Establece la hora al final del día
+
+            filtro.fecha = {
+                $gte: startDate,
+                $lte: endDate,
+            };
+        } else if (!fechaDesde && !fechaHasta) {
+            // Si no se proporcionan fechas, filtra por el mes actual
+            const fechaActual = new Date();
+            const mesInicio = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), 1);
+            const mesFin = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 0);
+
+            filtro.fecha = {
+                $gte: mesInicio,
+                $lte: mesFin,
+            };
+        }
+
+        // Buscar los remitos que coincidan con el CUIT y el filtro aplicado
+        const compras = await Compra.find(filtro);
         res.json(compras);
     } catch (error) {
-        console.log(error);
+        res.status(500).json({ message: error.message });
     }
 };
 

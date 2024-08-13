@@ -9,6 +9,8 @@ const router = express.Router();
 //trae todas las compras
 router.get('/', getAllCompras);
 
+//trae compras de un proveedor
+router.get('/remitosProveedor/:cuit', getComprasProveedor);
 //trae ult num remito
 router.get('/ultimoRemito', getUltimoRemito);
 
