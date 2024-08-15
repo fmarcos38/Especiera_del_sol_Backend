@@ -1,7 +1,8 @@
 const express = require('express');
 const { 
     getAllRemitos, creaRemito, elimninaRemito, ultimoRemito, getRemitosCliente, getRemitoById, 
-    modificaRemito, agregaEntrega, editaEntrega, eliminarEntrega
+    modificaRemito, agregaEntrega, editaEntrega, eliminarEntrega,
+    calcSaldoAnteriror
 } = require('../Controlers/remito');
 
 const router = express.Router();
@@ -36,5 +37,7 @@ router.put('/editaEntrega/:idRemito/entrega/:idEntrega', editaEntrega);
 // Ruta para eliminar una entrega
 router.delete('/eliminaEntrega/:idRemito/entrega/:idEntrega', eliminarEntrega);
 
+//calcula saldo restante
+router.get('/calcSaldo/:cuit', calcSaldoAnteriror);
 
 module.exports = router;

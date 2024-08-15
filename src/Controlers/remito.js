@@ -4,7 +4,7 @@ const Remito = require('../Models/modelRemito');
 const getAllRemitos = async(req, res) => {
     try {
         //así llega fecha: 2024-07-01
-        const {estado, fechaDesde, fechaHasta} = req.query; 
+        const {estado, fechaDesde, fechaHasta} = req.query;
         let filtro = {};
 
         //filtro por Debe o Pagado
@@ -46,7 +46,6 @@ const getAllRemitos = async(req, res) => {
         console.log(error);
     }
 };
-
 //trae reitos de un cliente x cuit del cliente
 const getRemitosCliente = async (req, res) => {
     //así llega fecha: 2024-07-01
@@ -91,7 +90,6 @@ const getRemitosCliente = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
 //trae el último remito para obtnere el num 
 const ultimoRemito = async(req, res) => {
     try {
@@ -103,7 +101,6 @@ const ultimoRemito = async(req, res) => {
         console.log(error)
     }
 };
-
 //trae remito por ID
 const getRemitoById = async(req,res) => {
     try {
@@ -116,7 +113,6 @@ const getRemitoById = async(req,res) => {
         console.log(error);
     }
 };
-
 //crea
 const creaRemito = async(req, res) => {
 
@@ -142,7 +138,6 @@ const creaRemito = async(req, res) => {
         console.log(error);
     }
 };
-
 //modif
 const modificaRemito = async(req, res) => {    
     try {
@@ -159,7 +154,6 @@ const modificaRemito = async(req, res) => {
         
     }
 };
-
 //elimna remito
 const elimninaRemito = async(req, res) => {
     try {
@@ -194,8 +188,8 @@ const agregaEntrega = async(req, res) => {
 }
 //edita entrega
 const editaEntrega = async (req, res) => {
-    const { idRemito, idEntrega } = req.params; console.log("ids:", req.params)
-    const { monto, metodoPago } = req.body; console.log("body:", req.body)
+    const { idRemito, idEntrega } = req.params; 
+    const { monto, metodoPago } = req.body; 
 
     try {
         const remito = await Remito.findOneAndUpdate(
@@ -219,7 +213,6 @@ const editaEntrega = async (req, res) => {
         res.status(500).json({ message: 'Error al editar la entrega' });
     }
 };
-
 // Eliminar un elemento del arreglo "entrego"
 const eliminarEntrega = async (req, res) => {
     const { idRemito, idEntrega } = req.params;
@@ -247,6 +240,31 @@ const eliminarEntrega = async (req, res) => {
     }
 };
 
+//----Calcula Saldo anteriror de un cliente
+const calcSaldoAnteriror = async(req, res) => {
+    const {cuit} = req.params; //console.log("Cuit:", req.params);
+    try {
+        const remitos = await Remito.find({cuit}); 
+        let saldo = 0;
+
+        remitos.map(r => {
+            if(r.estado === 'Debe'){
+                saldo += r.totPedido;
+                
+            }
+            r.entrego.map(e => {
+                saldo -= e.entrega;
+                return saldo;
+            });            
+            return saldo;
+        });
+        
+        res.json({saldoAnt: saldo});
+    } catch (error) {
+        
+    }
+};
+
 
 module.exports = {
     getAllRemitos,
@@ -259,4 +277,5 @@ module.exports = {
     agregaEntrega,
     editaEntrega,
     eliminarEntrega,
+    calcSaldoAnteriror
 }
