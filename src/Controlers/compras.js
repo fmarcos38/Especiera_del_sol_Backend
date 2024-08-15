@@ -141,8 +141,7 @@ const creaCompra = async(req, res) => {
         detalle, 
         producto, 
         cantidad, 
-        unitario, 
-        estado, 
+        unitario,
         observaciones, 
         detallePago,
         cuit
@@ -155,7 +154,7 @@ const creaCompra = async(req, res) => {
                 envio: "Pago",
                 detalle,
                 total,                
-                /* estado, */
+                cuit,
                 detallePago,
             });
             await newCompra.save();
