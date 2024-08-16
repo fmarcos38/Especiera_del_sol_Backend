@@ -10,7 +10,6 @@ const getAllProducts = async(req, res) => {
         console.log(error);
     }
 }
-
 //busca por nombre
 const buscaPorNombre = async(req, res) => {
     try {
@@ -26,7 +25,6 @@ const buscaPorNombre = async(req, res) => {
         console.log(error);
     }
 };
-
 //get by id
 const getById = async(req, res) => {
     try {
@@ -42,12 +40,68 @@ const getById = async(req, res) => {
         
     }
 };
+//crea
+const creaProducto = async(req, res) => {
+    const { nombre, unidadMedida, precioKg, envase, costo, posicionLista } = req.body; 
+    try {
+        // Desplazar las posiciones de los productos existentes
+        await Producto.updateMany(
+            { posicionLista: { $gte: posicionLista } },
+            { $inc: { posicionLista: 1 } }
+        );
+
+        // Crear nuevo producto
+        const nuevoProducto = new Producto({
+            nombre,
+            unidadMedida,
+            precioKg,
+            envase,
+            costo,
+            posicionLista,
+        });
+        // Guardar el nuevo producto
+        await nuevoProducto.save();
+
+        // Reenumerar todas las posiciones de los productos en la colección
+        const productos = await Producto.find().sort({ posicionLista: 1 });
+
+        for (let i = 0; i < productos.length; i++) {
+            productos[i].posicionLista = i + 1;
+            await productos[i].save();
+        }
+
+        res.status(200).send("Creado con éxito!!");
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error del servidor");
+    }
+};
+//modifica
+const modifProd = async(req, res) => {
+    const { _id } = req.params;
+    try {
+        // Actualizar el producto con los nuevos datos
+        const modifProd = {...req.body};
+        //actualizo
+        await Producto.findByIdAndUpdate(_id, modifProd);
+
+        //Reenumerar todas las posiciones de los productos en la colección
+        const productos = await Producto.find().sort({ posicionLista: 1 });
+        for (let i = 0; i < productos.length; i++) {
+            productos[i].posicionLista = i + 1;
+            await productos[i].save();
+        }
+        
+        res.status(200).json(modifProd);
+    } catch (error) {
+        console.log(error)
+    }
+};
 //elimina producto
 const eliminaProd = async(req, res) => {
     try {
         const { _id } = req.params;
         const prod = await Producto.findByIdAndDelete(_id).lean();
-        await cloudinary.uploader.destroy(prod.cloudinary_id);
         
         if(!prod){
             return res.send("Prod no encontrado");
@@ -72,5 +126,7 @@ module.exports = {
     getAllProducts,
     eliminaProd,
     buscaPorNombre,
-    getById
+    getById,
+    creaProducto,
+    modifProd
 }
