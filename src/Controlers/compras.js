@@ -3,7 +3,7 @@ const Compra = require('../Models/modelCompras');
 const getAllCompras = async(req, res) => {
     //así llega fecha: 2024-07-01
     try {
-        const { detalle, estado, fechaDesde, fechaHasta } = req.query; console.log("data:" ,req.query)
+        const { detalle, estado, fechaDesde, fechaHasta } = req.query; 
         let filtro = {}; 
 
         //filtro por detalle (Compra o Anticipo)
