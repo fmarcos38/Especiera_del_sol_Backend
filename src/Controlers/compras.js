@@ -3,7 +3,7 @@ const Compra = require('../Models/modelCompras');
 const getAllCompras = async(req, res) => {
     //así llega fecha: 2024-07-01
     try {
-        const { detalle, estado, fechaDesde, fechaHasta } = req.query; 
+        const { detalle, estado, fechaDesde, fechaHasta } = req.query; console.log("data:" ,req.query)
         let filtro = {}; 
 
         //filtro por detalle (Compra o Anticipo)
@@ -138,7 +138,8 @@ const creaCompra = async(req, res) => {
         proveedor, 
         items, 
         total, 
-        detalle, 
+        detalle,
+        estado, 
         producto, 
         cantidad, 
         unitario,
@@ -156,6 +157,7 @@ const creaCompra = async(req, res) => {
                 total,                
                 cuit,
                 detallePago,
+                estado: "Pago"
             });
             await newCompra.save();
             return res.json(newCompra);
@@ -171,7 +173,7 @@ const creaCompra = async(req, res) => {
                 unitario,
                 detalle,
                 total,
-                /* estado, */
+                estado,
                 observaciones,
                 detallePago,
                 items,

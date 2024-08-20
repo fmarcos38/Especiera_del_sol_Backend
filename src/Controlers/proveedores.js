@@ -51,7 +51,8 @@ const buscaProveedorPorNombre = async(req, res) => {
 const buscaProCuit = async(req, res) => {
     try {
         const {cuit} = req.params; 
-        const proveedor = await Proveedor.findOne({cuit});
+        const cuitConvert = Number(cuit);
+        const proveedor = await Proveedor.findOne({cuit: cuitConvert});
 
         if(!proveedor){ return res.send("No existe dicho prov")}
         
