@@ -12,6 +12,7 @@ const RemitoSchema = Schema({
     estado: {type: String},
     bultos: {type: Number},
     transporte: {type: String},
+    totKgs: {type: Number},
 });
 
 module.exports = model("Remitos", RemitoSchema);
