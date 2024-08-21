@@ -26,27 +26,31 @@ const traeVentasMes = async(month, year) => {
     }
 };
 //funcion trae Compras PARA un MES
-const traeComprasMes = async(month, year) => {
-    let compras;
+const traeComprasMes = async (month, year) => {
     try {
-        
-            const startDate = new Date(year, month - 1, 1);
-            const endDate = new Date(year, month, 1);
+        const startDate = new Date(year, month - 1, 1);
+        const endDate = new Date(year, month, 1);
 
-            compras = await Compras.find({
-                fecha: {
-                    $gte: startDate,
-                    $lt: endDate,
-                },
-            });
-            if(!compras){ return res.send("No hay ventas")}
-            
-            return compras;
-        
+        // Buscar solo las compras (excluir anticipos) dentro del rango de fechas
+        const compras = await Compras.find({
+            fecha: {
+                $gte: startDate,
+                $lt: endDate,
+            },
+            detalle: 'Compra' // Solo compras, excluye anticipos
+        });
+
+        if (!compras || compras.length === 0) {
+            return "No hay compras";
+        }
+
+        return compras;
     } catch (error) {
-        
+        console.error("Error al traer las compras del mes:", error);
+        throw error;
     }
 };
+
 //funcion trae gastos PARa un MES
 const traeGastosMes = async(month, year) => {
     let gastos;    
