@@ -1,4 +1,3 @@
-const cloudinary = require('../Helpers/cloudinary');
 const Producto = require('../Models/modelProductos');
 
 //trae productos desde la DB

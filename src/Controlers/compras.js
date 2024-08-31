@@ -207,7 +207,7 @@ const modificaCompra = async(req, res) => {
 //elimina
 const eliminaCompra = async(req, res) => {
     try {
-        const {_id} = req.params; console.log("ID:", _id);
+        const {_id} = req.params; 
         const compra = await Compra.findByIdAndDelete({_id});
 
         if(!compra){ return res.send("compra no encontrada")}
