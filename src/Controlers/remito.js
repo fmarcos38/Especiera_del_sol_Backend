@@ -94,9 +94,15 @@ const getRemitosCliente = async (req, res) => {
 const ultimoRemito = async(req, res) => {
     try {
         const remito =  await Remito.find().sort({$natural:-1}).limit(1);
-        res.json({
-            ultimoRemito: remito[0].numRemito
-        });
+        if(remito.length){
+            res.json({
+                ultimoRemito: remito[0].numRemito
+            });
+        }else{
+            res.json({
+                ultimoRemito: 0
+            });
+        }
     } catch (error) {
         console.log(error)
     }
