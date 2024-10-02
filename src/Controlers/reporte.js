@@ -50,7 +50,6 @@ const traeComprasMes = async (month, year) => {
         throw error;
     }
 };
-
 //funcion trae gastos PARa un MES
 const traeGastosMes = async(month, year) => {
     let gastos;    
@@ -72,7 +71,6 @@ const traeGastosMes = async(month, year) => {
         
     }
 };
-
 //funcion trae ventas Calc todo el mes Retorna el tot del mes
 const traeVentas = async(month, year) => {
     try {

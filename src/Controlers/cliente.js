@@ -21,16 +21,16 @@ const getByID = async(req, res) => {
     }
 };
 
-//trae cliente por nombre
-const buscaClientePorNombre = async (req, res) => {
+//trae cliente por nombreApellido
+const buscaClientePorNombre = async (req, res) => { 
     try {
-        const { nombre, apellido } = req.query;
+        const { nombreApellido } = req.query;
 
-        if (!nombre || !apellido) {
+        if (!nombreApellido) {
             return res.status(400).json({ message: 'Nombre y apellido son requeridos' });
         }
 
-        const cliente = await Cliente.findOne({ nombre, apellido });
+        const cliente = await Cliente.findOne({ nombreApellido });
         if (!cliente) {
             return res.status(404).json({ message: 'Cliente no encontrado' });
         }

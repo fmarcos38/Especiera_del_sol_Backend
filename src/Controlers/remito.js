@@ -47,7 +47,7 @@ const getAllRemitos = async(req, res) => {
     }
 };
 //trae reitos de un cliente x cuit del cliente
-const getRemitosCliente = async (req, res) => {
+const getRemitosCliente = async (req, res) => { 
     //así llega fecha: 2024-07-01
     try {
         const { estado, fechaDesde, fechaHasta } = req.query;
@@ -92,7 +92,7 @@ const getRemitosCliente = async (req, res) => {
 };
 //trae el último remito para obtnere el num 
 const ultimoRemito = async(req, res) => {
-    try {
+    try { 
         const remito =  await Remito.find().sort({$natural:-1}).limit(1);
         if(remito.length){
             res.json({
@@ -139,8 +139,7 @@ const creaRemito = async(req, res) => {
             items,
             fecha, 
             totPedido, 
-            cuit, 
-            fecha: fecha, 
+            cuit,
             condicion_pago, 
             estado,
             bultos,

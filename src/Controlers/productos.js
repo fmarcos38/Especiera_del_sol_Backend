@@ -1,10 +1,10 @@
 const Producto = require('../Models/modelProductos');
 
 //trae productos desde la DB
-const getAllProducts = async(req, res) => {
+const getAllProducts = async(req, res) => { 
     try {
         const allP = await Producto.find().sort({posicionLista: 1});
-        res.json(allP);
+        res.json(allP);    
     } catch (error) {
         console.log(error);
     }
