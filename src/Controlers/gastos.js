@@ -28,21 +28,33 @@ const getAllGastos = async(req, res) => {
     }
 };
  //crea
-const createGasto = async(req, res) => {
-    const {descripcion, monto} = req.body;
+const createGasto = async (req, res) => {
+    const { fecha, descripcion, monto } = req.body;   
+
     try {
+        // Convertir la fecha recibida (en formato DD/MM/YYYY) a un objeto Date
+        let [day, month, year] = fecha.split('/');
+        let fechaConHora = new Date(`${year}-${month}-${day}T00:00:00`);
+
+        // Verificar si la hora es 00:00:00 y sumarle 1 hora
+        if (fechaConHora.getHours() === 0) {
+            fechaConHora.setHours(fechaConHora.getHours() + 1); // Sumamos 1 hora
+        }
+
+        // Crear el nuevo gasto con la fecha ajustada
         const newGasto = new Gastos({
-            fecha: new Date(),
+            fecha: fechaConHora, // Utilizamos la fecha con la hora ajustada
             descripcion,
             monto
         });
+
         await newGasto.save();
-        res.send("Creado con exito");
+        res.send("Creado con éxito");
     } catch (error) {
         console.log(error);
+        res.status(500).send("Hubo un error al crear el gasto");
     }
 };
-
 //trae por ID
 const getByID = async(req, res) => {
     try {
@@ -53,12 +65,11 @@ const getByID = async(req, res) => {
         console.log(error);
     }
 };
-
 //modif
 const modificaGasto = async (req, res) => {
     try {
         const { _id } = req.params;
-        const updateData = req.body;
+        const updateData = req.body; 
 
 
         const updatedGoasto = await Gastos.findByIdAndUpdate(_id, updateData);
@@ -73,7 +84,6 @@ const modificaGasto = async (req, res) => {
         res.status(500).json({ message: 'Error al actualizar el cliente', error });
     }
 };
-
 //elimina
 const eliminaGasto = async (req, res) => {
     try {

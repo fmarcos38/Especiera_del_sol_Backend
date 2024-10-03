@@ -28,11 +28,15 @@ const getAllRemitos = async(req, res) => {
                 $lt: endDate, // Usar $lt para excluir la medianoche del siguiente día
             };
         } else if (!fechaDesde && !fechaHasta) {
-            //si no se proporcionan fechas MUESTRA la del mes ACTUAL
+            // Si no se proporcionan fechas, MUESTRA el mes ACTUAL con una hora ajustada
             const fechaActual = new Date();
-            const mesInicio = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), 1);
-            const mesFin = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 0);
-
+        
+            // Inicio del mes, estableciendo la hora a 01:00:00
+            const mesInicio = new Date(Date.UTC(fechaActual.getFullYear(), fechaActual.getMonth(), 1, 1, 0, 0));
+        
+            // Fin del mes, ajustando el último día y estableciendo la hora a 23:59:59
+            const mesFin = new Date(Date.UTC(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 0, 23, 59, 59));
+        
             filtro.fecha = {
                 $gte: mesInicio,
                 $lte: mesFin,
@@ -157,7 +161,7 @@ const modificaRemito = async(req, res) => {
     try {
         const {_id} = req.params;
         const { numRemito, cliente, items, fecha, totPedido, cuit, condicion_pago, estado, bultos, transporte } = req.body; 
-
+        
         // Calcula el tot de kgs del remito
         let totKgs = 0;
         items.forEach(item => {
@@ -171,7 +175,7 @@ const modificaRemito = async(req, res) => {
             numRemito,
             cliente, 
             items,
-            fecha, 
+            fecha: fecha+'T01:00:00Z', 
             totPedido, 
             cuit, 
             condicion_pago, 
