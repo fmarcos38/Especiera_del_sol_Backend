@@ -4,7 +4,7 @@ const Remito = require('../Models/modelRemito');
 const getAllRemitos = async(req, res) => {
     try {
         //así llega fecha: 2024-07-01
-        const {estado, fechaDesde, fechaHasta} = req.query; console.log("data:", req.query)
+        const {estado, fechaDesde, fechaHasta} = req.query; console.log("dataGET:", req.query)
         let filtro = {};
 
         //filtro por Debe o Pagado
@@ -13,18 +13,18 @@ const getAllRemitos = async(req, res) => {
         }
         //si vienen fechas
         if (fechaDesde && fechaHasta) {
-            // Convertir fechaDesde al inicio del día
+            // Convertir fechaDesde al inicio del día en UTC
             const startDate = new Date(fechaDesde);
-            startDate.setHours(0, 0, 0, 0);  // Inicio del día
+            startDate.setUTCHours(0, 0, 0, 0);  // Inicio del día en UTC
         
-            // Convertir fechaHasta al final del día
+            // Convertir fechaHasta al final del día en UTC
             const endDate = new Date(fechaHasta);
-            endDate.setHours(23, 59, 59, 999);  // Final del día
+            endDate.setUTCHours(23, 59, 59, 999);  // Final del día en UTC
         
-            // Configurar el filtro con las fechas ajustadas
+            // Configurar el filtro con las fechas ajustadas en UTC
             filtro.fecha = {
-                $gte: startDate,  // Desde el inicio de fechaDesde
-                $lte: endDate     // Hasta el final de fechaHasta
+                $gte: startDate,  // Desde el inicio de fechaDesde (en UTC)
+                $lte: endDate     // Hasta el final de fechaHasta (en UTC)
             };
         } else if (!fechaDesde && !fechaHasta) {
             // Si no se proporcionan fechas, MUESTRA el mes ACTUAL con una hora ajustada
@@ -123,36 +123,54 @@ const getRemitoById = async(req,res) => {
     }
 };
 //crea
-const creaRemito = async(req, res) => {
-
+const creaRemito = async (req, res) => {
     try {
-        const { numRemito, cliente, items, fecha, totPedido, cuit, condicion_pago, estado, bultos, transporte} = req.body; 
+        const { numRemito, cliente, items, fecha, totPedido, cuit, condicion_pago, estado, bultos, transporte } = req.body;
+        console.log("dataPost:", req.body);
 
-        //calcula el tot de kgs del remito
+        // Crear un objeto Date a partir de la fecha recibida (YYYY-MM-DD) pero sin la conversión automática a UTC
+        let [year, month, day] = fecha.split('-'); // Dividimos la fecha recibida
+        let fechaLocal = new Date(year, month - 1, day); // Aquí creamos la fecha local sin horas
+
+        // Obtener la hora actual local
+        const ahora = new Date();
+
+        // Ajustar la fecha recibida para asignar la hora actual local
+        fechaLocal.setHours(ahora.getHours(), ahora.getMinutes(), ahora.getSeconds(), ahora.getMilliseconds());
+
+        console.log("fechaHora ajustada:", fechaLocal);
+
+        // Calcular el total de kgs del remito
         let totKgs = 0;
         items.forEach(item => {
-            if(item.unidadMedida !== "unidad"){
+            if (item.unidadMedida !== "unidad") {
                 totKgs += item.cantidad;
             }
         });
 
+        // Crear un nuevo remito con la fecha y hora ajustada
         const newRemito = new Remito({
             numRemito,
-            cliente, 
+            cliente,
             items,
-            fecha, 
-            totPedido, 
+            fecha: fechaLocal, // Utilizamos la fecha con la hora ajustada
+            totPedido,
             cuit,
-            condicion_pago, 
+            condicion_pago,
             estado,
             bultos,
             transporte,
             totKgs
         });
+        
+        // Guardar el nuevo remito en la base de datos
         await newRemito.save();
+        
+        // Devolver el nuevo remito como respuesta
         res.json(newRemito);
     } catch (error) {
         console.log(error);
+        res.status(500).json({ message: "Error al crear el remito" });
     }
 };
 //modif
