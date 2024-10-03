@@ -29,7 +29,7 @@ const getAllGastos = async(req, res) => {
 };
  //crea
 const createGasto = async (req, res) => {
-    const { fecha, descripcion, monto } = req.body;   
+    const { fecha, descripcion, monto } = req.body;
 
     try {
         // Convertir la fecha recibida (en formato DD/MM/YYYY) a un objeto Date
