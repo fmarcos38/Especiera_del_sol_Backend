@@ -7,9 +7,6 @@ const CompraSchema = Schema({
     numCompra: {type: Number}, //num de compra a ese proveedor
     numRemitoProveedor: {type: Number},
     transporte: {type: String}, 
-    producto: {type: String},
-    cantidad: {type: Number}, 
-    unitario: {type: Number}, 
     total: {type: Number},
     detalle: {type: String}, //toma el valo "Anticipo" o "Compra"
     detallePago: {type: String},

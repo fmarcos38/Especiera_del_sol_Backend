@@ -75,7 +75,7 @@ const getComprasProveedor = async(req, res) => {
     try {
         const { detalle, estado, fechaDesde, fechaHasta } = req.query; 
         const { cuit } = req.params; 
-        let filtro = { cuit}; // Inicializamos el filtro con el CUIT del cliente
+        let filtro = { cuit}; // Inicializamos el filtro con el CUIT del prov
 
         //filtro por detalle (Compra o Anticipo)
         if(detalle && detalle !== "todos"){

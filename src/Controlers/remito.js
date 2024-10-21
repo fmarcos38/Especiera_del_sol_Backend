@@ -4,7 +4,7 @@ const Remito = require('../Models/modelRemito');
 const getAllRemitos = async(req, res) => {
     try {
         //así llega fecha: 2024-07-01
-        const {estado, fechaDesde, fechaHasta} = req.query; console.log("dataGET:", req.query)
+        const {estado, fechaDesde, fechaHasta} = req.query; 
         let filtro = {};
 
         //filtro por Debe o Pagado
@@ -126,7 +126,7 @@ const getRemitoById = async(req,res) => {
 const creaRemito = async (req, res) => {
     try {
         const { numRemito, cliente, items, fecha, totPedido, cuit, condicion_pago, estado, bultos, transporte } = req.body;
-        console.log("dataPost:", req.body);
+        
 
         // Crear un objeto Date a partir de la fecha recibida (YYYY-MM-DD) pero sin la conversión automática a UTC
         let [year, month, day] = fecha.split('-'); // Dividimos la fecha recibida
