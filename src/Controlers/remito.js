@@ -181,18 +181,22 @@ const modificaRemito = async(req, res) => {
         
         // Calcula el tot de kgs del remito
         let totKgs = 0;
-        items.forEach(item => {
+        items?.forEach(item => {
             if(item.unidadMedida !== "unidad"){
                 totKgs += item.cantidad;
             }
         });
+
+        // Verifica si la fecha está definida y bien formateada
+        let fechaFormateada = fecha ? new Date(fecha).toISOString().split('T')[0] + 'T01:00:00Z' : undefined;
+
 
         // Actualiza solo los campos necesarios
         const updatedFields = {
             numRemito,
             cliente, 
             items,
-            fecha: fecha+'T01:00:00Z', 
+            fecha: fechaFormateada, 
             totPedido, 
             cuit, 
             condicion_pago, 
@@ -241,6 +245,17 @@ const agregaEntrega = async(req, res) => {
 
         const newID = remito.entrego.length + 1;
         remito.entrego.push({id: newID, entrega: Number(monto), fechaEntrega: fechaActual, metodoPago: metodoPago});
+
+        //actualizo el estado si se saldo la deuda
+        let saldo = remito.totPedido;
+        remito.entrego.map(e => {
+            saldo -= e.entrega;
+            return saldo;
+        });
+        if(saldo === 0){
+            remito.estado = "Pagado";
+        }
+        //actualizo el remito
         remito = await Remito.findByIdAndUpdate(_id, remito);
         res.json(remito);
     } catch (error) {
