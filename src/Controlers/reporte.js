@@ -2,27 +2,23 @@ const Ventas = require('../Models/modelRemito');
 const Compras = require('../Models/modelCompras');
 const Gastos = require('../Models/modelGastos');
 
-//retorna un array con todas las ventas del Mes --> para mostrar por día
+//retorna un array con todas las ventas(remitos) del Mes --> para mostrar por día
 const traeVentasMes = async(month, year) => {
     try {
-        let ventas;
-        //si viene año y mes
-
         const startDate = new Date(year, month - 1, 1);
         const endDate = new Date(year, month, 1);
 
-        ventas = await Ventas.find({
+        const ventas = await Ventas.find({
             fecha: {
                 $gte: startDate,
                 $lt: endDate,
             },
         });
-        if (!ventas) { return "No hay ventas" }
 
-        return ventas;
-
+        return ventas.length ? ventas : [];
     } catch (error) {
-        
+        console.error("Error al traer las ventas del mes:", error);
+        return [];
     }
 };
 //funcion trae Compras PARA un MES
@@ -196,7 +192,7 @@ const traeGastos = async(month, year) => {
 //funcion calc la ganancia de c/venta, recibe por parametro un  remitos
 const calcGanancia = (items) => {
     let ganacia = 0;
-    items.map(item => {  
+    items?.map(item => {  
         ganacia += ((item.unitario * item.cantidad) - (item.costo * item.cantidad));
     });
     return ganacia;

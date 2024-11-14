@@ -54,7 +54,7 @@ const getRemitosCliente = async (req, res) => {
     //así llega fecha: 2024-07-01
     try {
         const { estado, fechaDesde, fechaHasta } = req.query;
-        const { cuit } = req.params;
+        const { cuit } = req.params; 
         let filtro = { cuit }; // Inicializamos el filtro con el CUIT del cliente
 
         // Filtro por estado (Debe o Pagado) si se proporciona
