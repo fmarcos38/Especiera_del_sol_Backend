@@ -1,52 +1,55 @@
 const Remito = require('../Models/modelRemito');
 
 
-const getAllRemitos = async(req, res) => {
+const getAllRemitos = async (req, res) => {
     try {
-        //así llega fecha: 2024-07-01
-        const {estado, fechaDesde, fechaHasta} = req.query; 
+        const { estado, fechaDesde, fechaHasta } = req.query; 
         let filtro = {};
 
-        //filtro por Debe o Pagado
-        if(estado && estado !== "todos"){
+        // Filtro por estado (Debe o Pagado)
+        if (estado && estado !== "todos") {
             filtro.estado = estado;
         }
-        //si vienen fechas
+
+        // Validación y manejo de fechas
+        const esFechaValida = (fecha) => !isNaN(new Date(fecha).getTime());
+
         if (fechaDesde && fechaHasta) {
-            // Convertir fechaDesde al inicio del día en UTC
-            const startDate = new Date(fechaDesde);
-            startDate.setUTCHours(0, 0, 0, 0);  // Inicio del día en UTC
-        
-            // Convertir fechaHasta al final del día en UTC
-            const endDate = new Date(fechaHasta);
-            endDate.setUTCHours(23, 59, 59, 999);  // Final del día en UTC
-        
-            // Configurar el filtro con las fechas ajustadas en UTC
-            filtro.fecha = {
-                $gte: startDate,  // Desde el inicio de fechaDesde (en UTC)
-                $lte: endDate     // Hasta el final de fechaHasta (en UTC)
-            };
+            if (esFechaValida(fechaDesde) && esFechaValida(fechaHasta)) {
+                // Convertir fechaDesde al inicio del día en UTC
+                const startDate = new Date(fechaDesde);
+                startDate.setUTCHours(0, 0, 0, 0);
+
+                // Convertir fechaHasta al final del día en UTC
+                const endDate = new Date(fechaHasta);
+                endDate.setUTCHours(23, 59, 59, 999);
+
+                filtro.fecha = {
+                    $gte: startDate,
+                    $lte: endDate,
+                };
+            } else {
+                return res.status(400).json({ message: "Las fechas proporcionadas no son válidas." });
+            }
         } else if (!fechaDesde && !fechaHasta) {
-            // Si no se proporcionan fechas, MUESTRA el mes ACTUAL con una hora ajustada
+            // Si no se proporcionan fechas, mostrar el mes actual
             const fechaActual = new Date();
-        
-            // Inicio del mes, estableciendo la hora a 01:00:00
+
             const mesInicio = new Date(Date.UTC(fechaActual.getFullYear(), fechaActual.getMonth(), 1, 1, 0, 0));
-        
-            // Fin del mes, ajustando el último día y estableciendo la hora a 23:59:59
             const mesFin = new Date(Date.UTC(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 0, 23, 59, 59));
-        
+
             filtro.fecha = {
                 $gte: mesInicio,
                 $lte: mesFin,
             };
         }
-        
-        const remitos = await Remito.find(filtro); //aplico filtro
-        res.json(remitos);
 
+        // Obtener remitos según el filtro
+        const remitos = await Remito.find(filtro);
+        res.json(remitos);
     } catch (error) {
-        console.log(error);
+        console.error(error);
+        res.status(500).json({ message: "Error al obtener remitos." });
     }
 };
 //trae reitos de un cliente x cuit del cliente
@@ -125,8 +128,8 @@ const getRemitoById = async(req,res) => {
 //crea
 const creaRemito = async (req, res) => {
     try {
-        const { numRemito, cliente, items, fecha, totPedido, cuit, condicion_pago, estado, bultos,tiporRemito } = req.body;
-
+        const { numRemito, cliente, items, fecha, totPedido, cuit, condicion_pago, estado, bultos, tipoRemito } = req.body;
+console.log("body:", req.body);
         // Crear un objeto Date a partir de la fecha recibida (YYYY-MM-DD)
         let [year, month, day] = fecha.split('-'); // Dividimos la fecha recibida
         let fechaLocal = new Date(year, month - 1, day); // Aquí creamos la fecha local
@@ -157,7 +160,7 @@ const creaRemito = async (req, res) => {
             items,
             fecha: fechaLocal, // Utilizamos la fecha con la hora ajustada
             totPedido,
-            tiporRemito,
+            tipoRemito,
             cuit,
             condicion_pago,
             estado,
