@@ -125,12 +125,16 @@ const getRemitoById = async(req,res) => {
 //crea
 const creaRemito = async (req, res) => {
     try {
-        const { numRemito, cliente, items, fecha, totPedido, cuit, condicion_pago, estado, bultos, transporte } = req.body;
-        
+        const { numRemito, cliente, items, fecha, totPedido, cuit, condicion_pago, estado, bultos,tiporRemito } = req.body;
 
-        // Crear un objeto Date a partir de la fecha recibida (YYYY-MM-DD) pero sin la conversión automática a UTC
+        // Crear un objeto Date a partir de la fecha recibida (YYYY-MM-DD)
         let [year, month, day] = fecha.split('-'); // Dividimos la fecha recibida
-        let fechaLocal = new Date(year, month - 1, day); // Aquí creamos la fecha local sin horas
+        let fechaLocal = new Date(year, month - 1, day); // Aquí creamos la fecha local
+
+        // Validar si la fecha se creó correctamente
+        if (isNaN(fechaLocal.getTime())) {
+            throw new Error('Fecha inválida');
+        }
 
         // Obtener la hora actual local
         const ahora = new Date();
@@ -138,11 +142,9 @@ const creaRemito = async (req, res) => {
         // Ajustar la fecha recibida para asignar la hora actual local
         fechaLocal.setHours(ahora.getHours(), ahora.getMinutes(), ahora.getSeconds(), ahora.getMilliseconds());
 
-        console.log("fechaHora ajustada:", fechaLocal);
-
         // Calcular el total de kgs del remito
         let totKgs = 0;
-        items.forEach(item => {
+        items?.forEach(item => {
             if (item.unidadMedida !== "unidad") {
                 totKgs += item.cantidad;
             }
@@ -155,11 +157,11 @@ const creaRemito = async (req, res) => {
             items,
             fecha: fechaLocal, // Utilizamos la fecha con la hora ajustada
             totPedido,
+            tiporRemito,
             cuit,
             condicion_pago,
             estado,
             bultos,
-            transporte,
             totKgs
         });
         
@@ -190,20 +192,21 @@ const modificaRemito = async(req, res) => {
         // Verifica si la fecha está definida y bien formateada
         let fechaFormateada = fecha ? new Date(fecha).toISOString().split('T')[0] + 'T01:00:00Z' : undefined;
 
+        //busco el remito a modif ya q puede q no me traiga todos las propiedades
+        const remitoModif = Remito.findById(_id);
 
         // Actualiza solo los campos necesarios
         const updatedFields = {
-            numRemito,
-            cliente, 
-            items,
+            numRemito: remitoModif.numRemito,
+            cliente: cliente || remitoModif.cliente, 
+            items: remitoModif.items,
             fecha: fechaFormateada, 
             totPedido, 
-            cuit, 
+            cuit: remitoModif.cuit, 
             condicion_pago, 
-            estado,
-            bultos,
-            transporte,
-            totKgs
+            estado: remitoModif.estado,
+            bultos: remitoModif.bultos,
+            totKgs: remitoModif.totKgs
         };
 
         const remito = await Remito.findByIdAndUpdate(_id, updatedFields, { new: true });
