@@ -45,6 +45,10 @@ const buscaClientePorNombre = async (req, res) => {
 const buscaClientePorCuit = async(req, res) => {
     try {
         const {cuit} = req.query; 
+
+        if (!cuit) {
+            return res.status(400).json({ message: 'El CUIT es requerido' });
+        }
         const cliente = await Cliente.findOne({cuit}); 
 
         if(!cliente){

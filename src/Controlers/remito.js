@@ -3,12 +3,13 @@ const Remito = require('../Models/modelRemito');
 
 const getAllRemitos = async (req, res) => {
     try {
-        const { estado, fechaDesde, fechaHasta } = req.query; 
+        const { tipoRemito, fechaDesde, fechaHasta } = req.query;
+        console.log("Query:", req.query);
         let filtro = {};
 
-        // Filtro por estado (Debe o Pagado)
-        if (estado && estado !== "todos") {
-            filtro.estado = estado;
+        // Filtro por tipo de remito
+        if (tipoRemito && tipoRemito !== "todos") {
+            filtro.tipoRemito = tipoRemito;
         }
 
         // Validación y manejo de fechas
@@ -35,7 +36,7 @@ const getAllRemitos = async (req, res) => {
             // Si no se proporcionan fechas, mostrar el mes actual
             const fechaActual = new Date();
 
-            const mesInicio = new Date(Date.UTC(fechaActual.getFullYear(), fechaActual.getMonth(), 1, 1, 0, 0));
+            const mesInicio = new Date(Date.UTC(fechaActual.getFullYear(), fechaActual.getMonth(), 1));
             const mesFin = new Date(Date.UTC(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 0, 23, 59, 59));
 
             filtro.fecha = {
@@ -129,15 +130,15 @@ const getRemitoById = async(req,res) => {
 const creaRemito = async (req, res) => {
     try {
         const { numRemito, cliente, items, fecha, totPedido, cuit, condicion_pago, estado, bultos, tipoRemito } = req.body;
-console.log("body:", req.body);
+console.log("Body:", req.body);
         // Crear un objeto Date a partir de la fecha recibida (YYYY-MM-DD)
         let [year, month, day] = fecha.split('-'); // Dividimos la fecha recibida
         let fechaLocal = new Date(year, month - 1, day); // Aquí creamos la fecha local
 
         // Validar si la fecha se creó correctamente
-        if (isNaN(fechaLocal.getTime())) {
+        /* if (isNaN(fechaLocal.getTime())) {
             throw new Error('Fecha inválida');
-        }
+        } */
 
         // Obtener la hora actual local
         const ahora = new Date();
