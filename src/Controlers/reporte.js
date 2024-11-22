@@ -8,12 +8,14 @@ const traeVentasMes = async(month, year) => {
         const startDate = new Date(year, month - 1, 1);
         const endDate = new Date(year, month, 1);
 
-        const ventas = await Ventas.find({
+        let ventas = await Ventas.find({
             fecha: {
                 $gte: startDate,
                 $lt: endDate,
             },
         });
+        //filtro que sean tipoRemito=Venta
+        ventas = ventas.filter(venta => venta.tipoRemito === "Venta");
 
         return ventas.length ? ventas : [];
     } catch (error) {
@@ -67,17 +69,32 @@ const traeGastosMes = async(month, year) => {
         
     }
 };
+
+//funcion calc kgs vendidos
+const totKgsVendidos = (ventas) => {
+    let tot = 0;
+    ventas.forEach(remito => {
+        remito.items.forEach(item => {
+            tot += parseFloat(item.cantidad) || 0; // Asegúrate de que item.cantidad sea un número
+        });
+    });
+
+    //que sea solo con dos dijitos despues de la coma, pero formato numero no string
+    return parseFloat(tot.toFixed(2));
+};
+
 //funcion trae ventas Calc todo el mes Retorna el tot del mes
 const traeVentas = async(month, year) => {
     try {
         let ventas;
         let totVentas = 0;
         let totGanancias = 0;
-        let totKgs = 0;
+        let totKgs = 0.0;
+
         //si viene año y mes
         if (year && month !== 0) {
-            const startDate = new Date(year, month - 1, 1); 
-            const endDate = new Date(year, month, 1); 
+            const startDate = new Date(Date.UTC(year, month - 1, 1)); 
+            const endDate = new Date(Date.UTC(year, month, 1)); 
 
             ventas = await Ventas.find({
                 fecha: {
@@ -85,14 +102,24 @@ const traeVentas = async(month, year) => {
                     $lt: endDate,
                 },
             });
-            if(!ventas){ return "No hay ventas"}
+
+            if (!ventas || ventas.length === 0) {
+                return {
+                    totVentas: 0,
+                    totGanancias: 0,
+                    totKgs: 0
+                };
+            }
             
-            ventas.map(v => {
-                return totVentas += v.totPedido;
+            //filtro que sean tipoRemito=Venta
+            ventas = ventas.filter(venta => venta.tipoRemito === "Venta");
+            //calc totVentas
+            ventas.forEach(v => {
+                totVentas += v.totPedido;
             });
             //caclulo ganancia
-            ventas.map(v => {
-                return totGanancias += calcGanancia(v.items);
+            ventas.forEach(v => {
+                totGanancias += calcGanancia(v.items);
             });
             //calc tot Kgs Vendidos
             totKgs = totKgsVendidos(ventas);
@@ -102,17 +129,28 @@ const traeVentas = async(month, year) => {
                 totGanancias,
                 totKgs
             };
-        }else{
-            ventas = await Ventas.find();            
-            ventas.map(v => {
-                return totVentas += v.totPedido;
+        } else {
+            ventas = await Ventas.find({ tipoRemito: "Venta" });
+
+            if (!ventas || ventas.length === 0) {
+                return {
+                    totVentas: 0,
+                    totGanancias: 0,
+                    totKgs: 0
+                };
+            }
+
+            //calc totVentas
+            ventas.forEach(v => {
+                totVentas += v.totPedido;
             });
             //caclulo ganancia
-            ventas.map(v => {
-                return totGanancias += calcGanancia(v.items);
+            ventas.forEach(v => {
+                totGanancias += calcGanancia(v.items);
             });
             //calc tot Kgs Vendidos
-            const totKgs = totKgsVendidos(ventas);
+            totKgs = totKgsVendidos(ventas);
+
             return {
                 totVentas,
                 totGanancias,
@@ -120,9 +158,15 @@ const traeVentas = async(month, year) => {
             };
         }
     } catch (error) {
-        
+        console.error("Error al traer las ventas:", error);
+        return {
+            totVentas: 0,
+            totGanancias: 0,
+            totKgs: 0
+        };
     }
 };
+
 //funcion trae Compras
 const traeCompras = async(month, year) => {
     let compras;
@@ -212,17 +256,7 @@ const nombreMes = (num) => {
     if(num === 11) {return "Noviembre"}
     if(num === 12) {return "Diciembre"}
 };
-//funcion calc kgs vendidos
-const totKgsVendidos = (ventas) => {
-    let tot = 0;
-    ventas.map(remito => {
-        remito.items.map(item => {
-            return tot += parseInt(item.cantidad);
-        });
-        return tot;
-    });
-    return tot;
-}
+
 //----------------------------------------------------------------------
 //trae reportes
 const reporteMes = async(req, res) => {
