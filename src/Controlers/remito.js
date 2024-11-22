@@ -130,15 +130,15 @@ const getRemitoById = async(req,res) => {
 const creaRemito = async (req, res) => {
     try {
         const { numRemito, cliente, items, fecha, totPedido, cuit, condicion_pago, estado, bultos, tipoRemito } = req.body;
-console.log("Body:", req.body);
+
         // Crear un objeto Date a partir de la fecha recibida (YYYY-MM-DD)
         let [year, month, day] = fecha.split('-'); // Dividimos la fecha recibida
         let fechaLocal = new Date(year, month - 1, day); // Aquí creamos la fecha local
 
         // Validar si la fecha se creó correctamente
-        /* if (isNaN(fechaLocal.getTime())) {
+        if (isNaN(fechaLocal.getTime())) {
             throw new Error('Fecha inválida');
-        } */
+        }
 
         // Obtener la hora actual local
         const ahora = new Date();

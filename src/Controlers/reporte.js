@@ -195,7 +195,7 @@ const calcGanancia = (items) => {
     items?.map(item => {  
         ganacia += ((item.unitario * item.cantidad) - (item.costo * item.cantidad));
     });
-    return ganacia;
+    return parseInt(ganacia);
 };
 //funcion asigna nombre del mes
 const nombreMes = (num) => {
@@ -217,7 +217,7 @@ const totKgsVendidos = (ventas) => {
     let tot = 0;
     ventas.map(remito => {
         remito.items.map(item => {
-            return tot += item.cantidad;
+            return tot += parseInt(item.cantidad);
         });
         return tot;
     });
