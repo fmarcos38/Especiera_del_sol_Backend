@@ -3,14 +3,8 @@ const Remito = require('../Models/modelRemito');
 
 const getAllRemitos = async (req, res) => {
     try {
-        const { tipoRemito, fechaDesde, fechaHasta } = req.query;
-        console.log("Query:", req.query);
+        const { fechaDesde, fechaHasta } = req.query;
         let filtro = {};
-
-        // Filtro por tipo de remito
-        if (tipoRemito && tipoRemito !== "todos") {
-            filtro.tipoRemito = tipoRemito;
-        }
 
         // Validación y manejo de fechas
         const esFechaValida = (fecha) => !isNaN(new Date(fecha).getTime());
@@ -30,7 +24,7 @@ const getAllRemitos = async (req, res) => {
                     $lte: endDate,
                 };
             } else {
-                return res.status(400).json({ message: "Las fechas proporcionadas no son válidas." });
+                return res.json({ message: "Las fechas proporcionadas no son válidas." });
             }
         } else if (!fechaDesde && !fechaHasta) {
             // Si no se proporcionan fechas, mostrar el mes actual
@@ -57,14 +51,9 @@ const getAllRemitos = async (req, res) => {
 const getRemitosCliente = async (req, res) => { 
     //así llega fecha: 2024-07-01
     try {
-        const { estado, fechaDesde, fechaHasta } = req.query;
+        const { fechaDesde, fechaHasta } = req.query;
         const { cuit } = req.params; 
         let filtro = { cuit }; // Inicializamos el filtro con el CUIT del cliente
-
-        // Filtro por estado (Debe o Pagado) si se proporciona
-        if (estado && estado !== "todos") {
-            filtro.estado = estado;
-        }
 
         // Filtro por fechas si se proporcionan
         if (fechaDesde && fechaHasta) {
@@ -183,8 +172,9 @@ const creaRemito = async (req, res) => {
 const modificaRemito = async(req, res) => {    
     try {
         const {_id} = req.params;
-        const { numRemito, cliente, items, fecha, totPedido, cuit, condicion_pago, estado, bultos, transporte } = req.body; 
-        
+        const { cliente, items, fecha, totPedido, cuit, condicion_pago, bultos } = req.body; 
+        console.log("Modif body:", req.body);
+
         // Calcula el tot de kgs del remito
         let totKgs = 0;
         items?.forEach(item => {
@@ -196,26 +186,28 @@ const modificaRemito = async(req, res) => {
         // Verifica si la fecha está definida y bien formateada
         let fechaFormateada = fecha ? new Date(fecha).toISOString().split('T')[0] + 'T01:00:00Z' : undefined;
 
-        //busco el remito a modif ya q puede q no me traiga todos las propiedades
-        const remitoModif = Remito.findById(_id);
+        // Busca el remito a modificar
+        const remitoModif = await Remito.findById(_id);
+        if (!remitoModif) {
+            return res.status(404).send("No existe el remito");
+        }
 
         // Actualiza solo los campos necesarios
         const updatedFields = {
             numRemito: remitoModif.numRemito,
             cliente: cliente || remitoModif.cliente, 
-            items: remitoModif.items,
-            fecha: fechaFormateada, 
-            totPedido, 
-            cuit: remitoModif.cuit, 
-            condicion_pago, 
-            estado: remitoModif.estado,
-            bultos: remitoModif.bultos,
-            totKgs: remitoModif.totKgs
+            items: items || remitoModif.items,
+            fecha: fechaFormateada || remitoModif.fecha, 
+            totPedido: totPedido || remitoModif.totPedido, 
+            cuit: cuit || remitoModif.cuit, 
+            condicion_pago: condicion_pago || remitoModif.condicion_pago, 
+            bultos: bultos || remitoModif.bultos,
+            totKgs: totKgs || remitoModif.totKgs
         };
 
         const remito = await Remito.findByIdAndUpdate(_id, updatedFields, { new: true });
 
-        if(!remito){ 
+        if (!remito) { 
             return res.status(404).send("No existe el remito");
         }
 
@@ -227,9 +219,9 @@ const modificaRemito = async(req, res) => {
     }
 };
 //elimna remito
-const elimninaRemito = async(req, res) => {
+const elimninaRemito = async(req, res) => { 
     try {
-        const {_id} = req.params;
+        const {_id} = req.params; console.log("Elimina id:", _id);
         const remito = await Remito.findByIdAndDelete({_id});
 
         if(!remito){ return res.send("Remito no encontrado")}
@@ -237,89 +229,6 @@ const elimninaRemito = async(req, res) => {
         res.json(remito);
     } catch (error) {
         console.log(error);
-    }
-};
-
-//-----Manejo de entregas HACER un Modelo con su CRUD 
-//inserta una entrega de dinero 
-const agregaEntrega = async(req, res) => {
-    const {_id} = req.params;
-    const {monto, metodoPago} = req.body; 
-    const fechaActual = new Date(); //console.log("fecha:", fechaActual)
-    try {
-        let remito = await Remito.findById(_id);
-        if(!remito){return res.send("No existe el remito")}
-
-        const newID = remito.entrego.length + 1;
-        remito.entrego.push({id: newID, entrega: Number(monto), fechaEntrega: fechaActual, metodoPago: metodoPago});
-
-        //actualizo el estado si se saldo la deuda
-        let saldo = remito.totPedido;
-        remito.entrego.map(e => {
-            saldo -= e.entrega;
-            return saldo;
-        });
-        if(saldo === 0){
-            remito.estado = "Pagado";
-        }
-        //actualizo el remito
-        remito = await Remito.findByIdAndUpdate(_id, remito);
-        res.json(remito);
-    } catch (error) {
-        console.log(error);
-    }
-}
-//edita entrega
-const editaEntrega = async (req, res) => {
-    const { idRemito, idEntrega } = req.params; 
-    const { monto, metodoPago } = req.body; 
-
-    try {
-        const remito = await Remito.findOneAndUpdate(
-            { _id: idRemito, "entrego.id": parseInt(idEntrega) },
-            {
-                $set: {
-                    "entrego.$.entrega": parseInt(monto),
-                    "entrego.$.metodoPago": metodoPago
-                }
-            },
-            { new: true }
-        );
-
-        if (!remito) {
-            return res.status(404).json({ message: 'Remito o entrega no encontrada' });
-        }
-
-        res.json(remito);
-    } catch (error) {
-        console.error("Error al editar la entrega:", error);
-        res.status(500).json({ message: 'Error al editar la entrega' });
-    }
-};
-// Eliminar un elemento del arreglo "entrego"
-const eliminarEntrega = async (req, res) => {
-    const { idRemito, idEntrega } = req.params;
-
-    try {
-        // Buscar el remito por ID
-        let remito = await Remito.findById(idRemito);
-        if (!remito) {
-            return res.status(404).json({ message: "Remito no encontrado" });
-        }
-
-        // Filtrar el array 'entrego' para eliminar el elemento con el ID proporcionado
-        const newEntrego = remito.entrego.filter(e => e.id !== Number(idEntrega));
-
-        // Actualizar el remito con el nuevo array 'entrego'
-        remito.entrego = newEntrego;
-
-        // Guardar los cambios en la base de datos
-        await remito.save();
-
-        res.json(remito);
-    } catch (error) {
-        console.error('Error al eliminar la entrega:', error);
-        res.status(500).json({ message: 'Error al eliminar la entrega', error });
     }
 };
 
@@ -357,8 +266,5 @@ module.exports = {
     creaRemito,
     modificaRemito,
     elimninaRemito,
-    agregaEntrega,
-    editaEntrega,
-    eliminarEntrega,
     calcSaldoAnteriror
 }

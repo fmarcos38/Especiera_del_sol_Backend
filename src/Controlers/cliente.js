@@ -41,23 +41,30 @@ const buscaClientePorNombre = async (req, res) => {
     }
 };
 
-//trea cliente por cuit
+//trae cliente por cuit
 const buscaClientePorCuit = async(req, res) => {
     try {
-        const {cuit} = req.query; 
+        const { cuit } = req.query;
 
         if (!cuit) {
             return res.status(400).json({ message: 'El CUIT es requerido' });
         }
-        const cliente = await Cliente.findOne({cuit}); 
 
-        if(!cliente){
-            return res.send("El cliente no existe");
+        const cuitNumber = Number(cuit);
+        if (isNaN(cuitNumber)) {
+            return res.status(400).json({ message: 'El CUIT debe ser un número válido' });
+        }
+
+        const cliente = await Cliente.findOne({ cuit: cuitNumber });
+
+        if (!cliente) {
+            return res.json({ message: 'El cliente no existe' });
         }
 
         res.json(cliente);
     } catch (error) {
         console.log(error);
+        res.status(500).json({ message: 'Error al buscar el cliente' });
     }
 };
 
