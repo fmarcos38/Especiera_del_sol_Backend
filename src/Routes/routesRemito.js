@@ -1,6 +1,6 @@
 const express = require('express');
 const { 
-    getAllRemitos, creaRemito, elimninaRemito, ultimoRemito, 
+    getAllRemitos, creaRemito, eliminaRemito, ultimoRemito, 
     getRemitosCliente, getRemitoById, modificaRemito, calcSaldoAnteriror
 } = require('../Controlers/remito');
 
@@ -25,7 +25,7 @@ router.get('/ultimoRemito', ultimoRemito);
 router.put('/modificaRemito/:_id', modificaRemito);
 
 //elimnia
-router.delete('/elimina/:_id', elimninaRemito);
+router.delete('/elimina/:_id', eliminaRemito);
 
 //calcula saldo restante
 router.get('/calcSaldo/:cuit', calcSaldoAnteriror);

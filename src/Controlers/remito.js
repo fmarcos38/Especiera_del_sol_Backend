@@ -219,16 +219,25 @@ const modificaRemito = async(req, res) => {
     }
 };
 //elimna remito
-const elimninaRemito = async(req, res) => { 
+const eliminaRemito = async(req, res) => { 
     try {
-        const {_id} = req.params; console.log("Elimina id:", _id);
-        const remito = await Remito.findByIdAndDelete({_id});
+        const { _id } = req.params;
+        console.log("Elimina id:", _id);
 
-        if(!remito){ return res.send("Remito no encontrado")}
+        if (!_id) {
+            return res.status(400).json({ message: "El ID es requerido" });
+        }
 
-        res.json(remito);
+        const remito = await Remito.findByIdAndDelete(_id);
+
+        if (!remito) {
+            return res.status(404).json({ message: "Remito no encontrado" });
+        }
+
+        res.json({ message: "Remito eliminado con éxito", remito });
     } catch (error) {
-        console.log(error);
+        console.error("Error al eliminar el remito:", error);
+        res.status(500).json({ message: "Error al eliminar el remito" });
     }
 };
 
@@ -265,6 +274,6 @@ module.exports = {
     ultimoRemito,
     creaRemito,
     modificaRemito,
-    elimninaRemito,
+    eliminaRemito,
     calcSaldoAnteriror
 }
